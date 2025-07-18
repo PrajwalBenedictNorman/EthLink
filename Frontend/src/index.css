@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@layer base {
+  html, body, #root {
+    @apply bg-gradient-to-br from-[#11121a] via-[#14142b] to-[#212154]
+      w-full min-h-screen m-0 p-0
+      overscroll-none 
+      overflow-x-auto overflow-y-auto;
+  }
+}
