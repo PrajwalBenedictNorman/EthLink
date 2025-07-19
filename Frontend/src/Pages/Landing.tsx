@@ -67,27 +67,30 @@ function Landing() {
   return (
     <>
       {/* NavBar */}
-      <div className="flex items-center justify-between px-12 py-4">
-        <div className="flex items-center gap-24">
+      <div className="flex items-center justify-between sm:px-12 px-4 py-4  ">
+        <div className="flex items-center gap-24 ">
           <Logo />
-          <div>
-            <Link to={""} className="text-[#636878] ms-8 p-2">
+          <div className="lg:block hidden">
+            <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
               Home
             </Link>
-            <Link to={""} className="text-[#636878] ms-8 p-2">
+            <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
               About
             </Link>
-            <Link to={""} className="text-[#636878] ms-8 p-2">
+            <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
               Contact
             </Link>
-            <Link to={""} className="text-[#636878] ms-8 p-2">
+            <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
               Docs
             </Link>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="sm:flex hidden items-center gap-4">
           <Button variant="primary" content="Sign in" />
           <Button variant="primary" content="Sign up" />
+        </div>
+        <div className="md:hidden">
+          <button className="text-5xl text-white">&#x2630;</button>
         </div>
       </div>
 
@@ -103,11 +106,13 @@ function Landing() {
         <p className="text-[#636878] text-xl mt-10">
           Securely manages your digital assets
         </p>
-        <Button
+        <div className="flex justify-center">
+           <Button
           variant="primary"
           content="Get Started"
-          className="bg-gradient-to-tr from-violet-600 via-indigo-500 to-blue-500 text-white text-xl px-8 py-3  rounded-2xl mt-8 hover:from-indigo-400 hover:to-violet-300 hover:transition-all duration-700 ms-[44vw]"
+          className="bg-gradient-to-tr from-violet-600 via-indigo-500 to-blue-500 text-white text-xl px-8 py-3  rounded-2xl mt-8 hover:from-indigo-400 hover:to-violet-300 hover:transition-all duration-700"
         />
+        </div>
       </div>
 
       {/* Scroll Section */}
@@ -179,19 +184,19 @@ function Landing() {
 
         {/* Heading */}
         <div className="top-70 relative">
-        <h1 className="text-white text-5xl ms-[32vw] ">
+        <h1 className="text-white text-5xl text-center ">
           Everything in just one Click 
         </h1>
          {/* Placeholder Cards */}
         <div className="flex gap-8 mt-24 ms-14  overflow-x-auto pb-6" >
-        <div className="bg-gradient-to-br from-[#c2e9fb] to-[#a1c4fd] h-[70vh] w-[27vw] rounded-2xl min-w-[27vw] shadow-xl  p-2">
+        <div className="bg-gradient-to-br from-[#c2e9fb] to-[#a1c4fd] h-[70vh] w-[350px] rounded-2xl min-w-[350px] shadow-xl  p-2">
           <h3 className="text-3xl font-semibold ms-18">DApp Ready Wallet</h3>
             <p>Seemless connectivity with dapps</p>
         </div>
-        <div className="bg-gradient-to-br from-[#fbc2eb] to-[#a6c1ee] h-[70vh] w-[27vw] rounded-2xl min-w-[27vw] "></div>
-        <div className="bg-gradient-to-br from-[#fad0c4] to-[#ffd1ff] h-[70vh] w-[27vw] rounded-2xl min-w-[27vw]"></div>
-        <div className="bg-gradient-to-br from-[#d9afd9] to-[#97d9e1] h-[70vh] w-[27vw] rounded-2xl min-w-[27vw]"></div>
-        <div className="bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] h-[70vh] w-[27vw] rounded-2xl min-w-[27vw]"></div>
+        <div className="bg-gradient-to-br from-[#fbc2eb] to-[#a6c1ee] h-[70vh] w-[350px] rounded-2xl min-w-[350px] "></div>
+        <div className="bg-gradient-to-br from-[#fad0c4] to-[#ffd1ff] h-[70vh] w-[350px] rounded-2xl min-w-[350px]"></div>
+        <div className="bg-gradient-to-br from-[#d9afd9] to-[#97d9e1] h-[70vh] w-[350px] rounded-2xl min-w-[350px]"></div>
+        <div className="bg-gradient-to-br from-[#e0c3fc] to-[#8ec5fc] h-[70vh] w-[350px] rounded-2xl min-w-[350px]"></div>
       </div>
         </div>
 
@@ -214,10 +219,46 @@ function Landing() {
          </div>
         </div>
       </div>
+     </div>
 
-       </div>
+     {/* Footer */}
+  <footer className="bg-gradient-to-br from-[#2C2F48] to-[#1B1D2C] text-white py-10 px-8 min-h-[40svh]">
+  <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+    <div className="text-lg font-semibold">
+      EthLink Presents
+    </div>
 
-       
+    <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
+      <div>
+        <h1 className="text-md font-bold">PRODUCT</h1>
+        <p className="text-xs py-2">Updates</p>
+        <p className="text-xs py-2">Features</p>
+        <p className="text-xs py-2">Reviews</p>
+      </div>
+
+      <div>
+        <h1 className="text-md font-bold">ABOUT US</h1>
+        <p className="text-xs py-2">Our Story</p>
+        <p className="text-xs py-2">Made with Care</p>
+        <p className="text-xs py-2">Blog</p>
+      </div>
+
+      <div>
+        <h1 className="text-md font-bold">ASSISTANCE</h1>
+        <p className="text-xs py-2">Terms & Conditions</p>
+        <p className="text-xs py-2">Privacy Policy</p>
+        <p className="text-xs py-2">Accessibility</p>
+      </div>
+    </div>
+  </div>
+
+  <div className="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+    <p className="text-sm text-center md:text-left">
+      © 2025 EthLink. Powered by Ethereum.
+    </p>
+    <button className="text-sm underline hover:text-blue-400">GitHub</button>
+  </div>
+</footer>
       </div>
     </>
   );

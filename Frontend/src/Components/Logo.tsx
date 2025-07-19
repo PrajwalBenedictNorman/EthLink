@@ -7,7 +7,7 @@ function Logo() {
   <circle cx="32" cy="32" r="32" fill="#1F1F2E"/>
   <path d="M32 10L20 32L32 26L44 32L32 10Z" fill="#8C8CFF"/>
   <path d="M32 54L44 36L32 42L20 36L32 54Z" fill="#4A4AFF"/>
-</svg><h1 className="text-7xl ">EthLink</h1>
+</svg><h1 className="sm:text-7xl text-5xl ">EthLink</h1>
     </div>
   )
 }
