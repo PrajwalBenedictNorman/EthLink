@@ -62,12 +62,14 @@ function Signin() {
         <div className="mt-8 space-y-5">
           <input
             type="text"
+            ref={usernameRef}
             name="username"
             placeholder="Username"
             className="text-white px-4 py-2 rounded bg-[#272b3e7c] w-full"
           />
           <input
             type="password"
+            ref={passwordRef}
             name="password"
             placeholder="Password"
             className="text-white px-4 py-2 rounded bg-[#272b3e7c] w-full"
@@ -75,7 +77,7 @@ function Signin() {
         </div>
 
         <div className="flex justify-center">
-          <Button variant="primary" content="Sign in" className="mt-8 text-center" />
+          <Button variant="primary" content="Sign in" className="mt-8 text-center" onClick={signinn}/>
         </div>
 
         <div className="flex items-center gap-4 my-6">

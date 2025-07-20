@@ -9,6 +9,7 @@ interface buttonProps {
   frontIcon?:ReactElement,
   backIcon?:ReactElement,
   className?:string,
+  onClick:()=>void
 }
 
 const variantStyles: Record<Variant, string> = {
@@ -19,7 +20,7 @@ const variantStyles: Record<Variant, string> = {
 
 function Button(props:buttonProps) {
   return (
-    <button className={clsx(props.className,variantStyles[props.variant],'flex items-center gap-2 transition duration-1000 ')}>{props.content}</button>
+    <button className={clsx(props.className,variantStyles[props.variant],'flex items-center gap-2 transition duration-1000 ')} onClick={props.onClick}>{props.content}</button>
   )
 }
 

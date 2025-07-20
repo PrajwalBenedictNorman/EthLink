@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,7 +48,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const client_1 = require("@prisma/client");
 const express_1 = require("express");
-const zod_1 = __importDefault(require("zod"));
+const zod_1 = __importStar(require("zod"));
 const eth_wallet_1 = __importDefault(require("./eth_wallet"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -26,7 +59,13 @@ const ethers_1 = require("ethers");
 exports.userRouter = (0, express_1.Router)();
 const client = new client_1.PrismaClient();
 const provider = new ethers_1.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
-const userSchema = zod_1.default.object({
+const userSignupSchema = zod_1.default.object({
+    username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
+    password: zod_1.default.string(),
+    firstName: zod_1.default.string(),
+    lastName: (0, zod_1.string)()
+});
+const userSigninSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password: zod_1.default.string()
 });
@@ -43,21 +82,21 @@ function generateTokken(username, id, pubKey) {
     return { accessTokken, refreshTokken };
 }
 exports.userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const resp = userSchema.safeParse(req.body);
+    const resp = userSignupSchema.safeParse(req.body);
     if (!resp.success) {
         return res.status(400).json({ message: "No response" });
     }
     const { privateKey, pubKey } = yield (0, eth_wallet_1.default)();
-    const { username, password } = resp.data;
+    const { username, password, firstName, lastName } = resp.data;
     if (!privateKey || !pubKey)
         return res.json({ message: "the key pair not generated" });
-    const user = yield client.user.create({ data: { username, password, privateKey, pubKey } });
+    const user = yield client.user.create({ data: { username, password, firstName, lastName, privateKey, pubKey } });
     if (!user)
         return res.status(400).json({ message: "User not created" });
     res.status(200).json({ message: "User Created" });
 }));
 exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const resp = userSchema.safeParse(req.body);
+    const resp = userSigninSchema.safeParse(req.body);
     if (!resp.success) {
         return res.status(400).json({ message: "No response" });
     }

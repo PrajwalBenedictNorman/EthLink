@@ -1,6 +1,6 @@
 import Button from "../Components/Button";
 import Logo from "../Components/Logo";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import {
   motion,
   useMotionValue,
@@ -64,6 +64,10 @@ function Landing() {
     y.set(0);
   };
 
+const navigate=useNavigate()
+
+
+
   return (
     <>
       {/* NavBar */}
@@ -86,8 +90,10 @@ function Landing() {
           </div>
         </div>
         <div className="sm:flex hidden items-center gap-4">
-          <Button variant="primary" content="Sign in" />
-          <Button variant="primary" content="Sign up" />
+          <Button variant="primary" content="Sign in" onClick={()=>{
+            console.log("Clicked")
+            navigate('/signin')}}/>
+          <Button variant="primary" content="Sign up" onClick={()=>navigate('/signup')}/>
         </div>
         <div className="md:hidden">
           <button className="text-5xl text-white">&#x2630;</button>
@@ -111,6 +117,7 @@ function Landing() {
           variant="primary"
           content="Get Started"
           className="bg-gradient-to-tr from-violet-600 via-indigo-500 to-blue-500 text-white text-xl px-8 py-3  rounded-2xl mt-8 hover:from-indigo-400 hover:to-violet-300 hover:transition-all duration-700"
+          onClick={()=>navigate("/signup")}
         />
         </div>
       </div>

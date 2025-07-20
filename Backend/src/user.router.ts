@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router,Request,Response} from "express";
-import z from 'zod'
+import z, { string } from 'zod'
 import generateKeyPair from "./eth_wallet";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -15,7 +15,13 @@ import { Transaction,hexlify,JsonRpcProvider } from "ethers";
 export const userRouter=Router()
 const client=new PrismaClient()
 const provider = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
-const userSchema=z.object({
+const userSignupSchema=z.object({
+    username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
+    password:z.string(),
+    firstName:z.string(),
+    lastName:string()
+})
+const userSigninSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password:z.string()
 })
@@ -39,20 +45,20 @@ function generateTokken(username:string,id:number,pubKey:string){
 
 userRouter.post("/signup",async (req:Request,res:Response):Promise<any>=>{
 
-const resp=userSchema.safeParse(req.body)
+const resp=userSignupSchema.safeParse(req.body)
 if(!resp.success) {return res.status(400).json({message:"No response"})}
 
 const {privateKey,pubKey}=await generateKeyPair()
-const {username,password}=resp.data
+const {username,password,firstName,lastName}=resp.data
 if (!privateKey || !pubKey) return res.json({message:"the key pair not generated"})
-    const user=await client.user.create({data:{username,password,privateKey,pubKey}})
+    const user=await client.user.create({data:{username,password,firstName,lastName,privateKey,pubKey}})
     if(!user) return res.status(400).json({message:"User not created"})
      res.status(200).json({message:"User Created"})
 })
 
 
 userRouter.post("/signin",async (req,res):Promise<any>=>{
-    const resp=userSchema.safeParse(req.body)
+    const resp=userSigninSchema.safeParse(req.body)
 if(!resp.success) {return res.status(400).json({message:"No response"})}
 const {username,password}=resp.data
 
