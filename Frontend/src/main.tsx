@@ -13,6 +13,8 @@ import Landing from './Pages/Landing'
 import Home from './Pages/Home'
 import "./Wallet_Standard/RegisterWallet"
 import Connect from './Pages/Connect'
+import Dapp from './Pages/Dapp';
+import Swap from './Pages/Swap';
 const router=createBrowserRouter([
   {
     path:"/",
@@ -33,6 +35,13 @@ const router=createBrowserRouter([
       {
        path:"/Home/connect",
        element:<Connect />
+     },{
+      path:"/dapp",
+      element:<Dapp />
+     },
+     {
+      path:"/swap",
+      element:<Swap />
      }
         
 
