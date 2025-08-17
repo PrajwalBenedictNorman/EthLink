@@ -12,7 +12,7 @@ function Signup() {
   const navigate=useNavigate()
 
     async function sign(){
-      const user=await axios.post("http://localhost:3000/user/signup",{firstName,lastName,username,password})
+      const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signup`,{firstName,lastName,username,password})
       if(!user) return alert("No user created")
       navigate("/signin")
     } 

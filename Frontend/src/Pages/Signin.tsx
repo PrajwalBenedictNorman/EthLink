@@ -20,7 +20,7 @@ function Signin() {
         const username=usernameRef.current?.value
         const password=passwordRef.current?.value
         console.log(username,password)
-        const user=await axios.post("http://localhost:3000/user/signin",{username,password})
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signin`,{username,password})
         if (!user) return alert("User not found") 
         else{console.log(user); navigate("/Home"); sessionStorage.setItem("accessTokken",user.data.accessTokken)} 
     }
@@ -29,7 +29,7 @@ function Signin() {
          const username=usernameRef.current?.value
         const password=passwordRef.current?.value
         console.log(username,password)
-        const user=await axios.post("http://localhost:3000/user/signin",{username,password})
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signin`,{username,password})
         if (!user){
           return alert("User not found") 
           //todo redirect to dapp with no user

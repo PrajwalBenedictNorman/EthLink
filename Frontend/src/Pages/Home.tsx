@@ -74,7 +74,7 @@ async function sendTansaction(){
   // todo check if wallet exists and the amt is genuien 
   console.log("reached")
     console.log(sendAddress,sendAmt)
-    const hash=await axios.post("http://localhost:3000/user/signAndSendTransaction",{
+    const hash=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signAndSendTransaction`,{
       "receiverAddress":sendAddress,
       "amt":sendAmt
     },{
