@@ -40,7 +40,7 @@ function Landing() {
   `;
 
   const ROTATION_RANGE = 60;
-  const HALF_ROTATION = ROTATION_RANGE / 2;
+  
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
