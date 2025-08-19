@@ -211,7 +211,7 @@ useGSAP(()=>{
      </div>
 
      {/* Footer */}
-  <footer className="bg-gradient-to-br from-[#2C2F48] to-[#1B1D2C] text-white py-10 px-8 min-h-[40svh]">
+  <footer className="bg-gradient-to-br from-[#2C2F48] to-[#1B1D2C] text-white py-10 px-8 min-h-[40svh] mt-4 md:mt-0">
   <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
     <div className="text-lg font-semibold">
       EthLink Presents
