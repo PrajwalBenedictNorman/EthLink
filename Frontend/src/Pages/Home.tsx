@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import {jwtDecode} from 'jwt-decode'
 import axios from "axios";
-import Logo from "../Components/Logo";
+import Logo2 from "../Components/Logo2";
 import Button from "../Components/Button";
 import { useNavigate } from "react-router";
 function Home() {
@@ -11,6 +11,7 @@ function Home() {
   pubKey: string;
   userId:number
 };
+  const [visible,setVisible]=useState(true)
   const [firstName,setFirstName]=useState("Prajwal")
   const [lastName,setLastName]=useState("Norman")
   const [Balance,setBalance]=useState(0)
@@ -177,10 +178,13 @@ async function sendTansaction(){
   // )
   return(
     <>
+    
     {/* SideBar Section */}
-    <div className="bg-[#1a1d2a] min-h-screen w-[320px]  fixed ">
-      <div className="mt-4 px-1">
-      <Logo />
+    <div className={`bg-[#1a1d2a] min-h-screen w-[300px]  fixed ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"}`}>
+      <div className="mt-4 px-1 flex items-center justify-between">
+      <Logo2 />
+      <button className="text-white text-xl me-4" onClick={()=>{setVisible(false)}}>&#x25C0;</button>
+      
       </div>
       
       <div className="mt-10 px-7">
@@ -208,6 +212,8 @@ async function sendTansaction(){
         </button> 
     </div>
    </div>
+
+   {!visible && <button className="text-white text-2xl ms-4 mt-4" onClick={()=>setVisible(true)}>&#x25B6;</button>}
      {/* Main DAashboard */}
     <div className="ms-[321px]">
       <div className="flex items-center justify-between mt-24">

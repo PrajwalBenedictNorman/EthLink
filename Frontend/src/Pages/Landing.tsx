@@ -62,7 +62,13 @@ useGSAP(()=>{
     })
 },[]) 
 
-
+function userModal(){
+  return(
+    <div className="">
+      
+    </div>
+  )
+}
   return (
     <>
       {/* NavBar */}
@@ -91,7 +97,7 @@ useGSAP(()=>{
           <Button variant="primary" content="Sign up" onClick={()=>navigate('/signup')}/>
         </div>
         <div className="md:hidden">
-          <button className="text-5xl text-white">&#x2630;</button>
+          <button className="text-5xl text-white" onClick={userModal}>&#x2630;</button>
         </div>
       </div>
 
