@@ -76,8 +76,8 @@ client.$use((params, next) => __awaiter(void 0, void 0, void 0, function* () {
                 params.args.data.password = yield bcrypt_1.default.hash(params.args.data.password, 10);
     return next(params);
 }));
-function generateTokken(username, id, pubKey) {
-    const accessTokken = jsonwebtoken_1.default.sign({ username, id, pubKey }, process.env.ACCESS_TOKEN_PASSWORD);
+function generateTokken(username, id, pubKey, firstName, lastName) {
+    const accessTokken = jsonwebtoken_1.default.sign({ username, id, pubKey, firstName, lastName }, process.env.ACCESS_TOKEN_PASSWORD);
     const refreshTokken = jsonwebtoken_1.default.sign({ username, id }, process.env.REFRESH_TOKEN_PASSWORD);
     return { accessTokken, refreshTokken };
 }
@@ -111,17 +111,19 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
     const verified = yield bcrypt_1.default.compare(password, user.password);
     if (!verified)
         return res.json({ message: "Wrong password" });
-    const { accessTokken, refreshTokken } = generateTokken(user.username, user.id, user.pubKey);
+    const { accessTokken, refreshTokken } = generateTokken(user.username, user.id, user.pubKey, user.firstName, user.lastName);
     const updatedUser = yield client.user.update({
         where: {
             id: user.id
         },
         data: {
-            accessTokken, refreshTokken
+            refreshTokken
         }
+        //todo remove accessToken from schema 
     });
     if (!updatedUser)
         return res.status(400).json({ message: "Not updated the user" });
+    console.log(accessTokken);
     res.status(200).json({ message: "User Signed in", accessTokken });
 }));
 exports.userRouter.post("/signAndSendTransaction", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {

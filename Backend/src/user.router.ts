@@ -36,8 +36,8 @@ client.$use(async(params,next)=>{
 })
 
 
-function generateTokken(username:string,id:number,pubKey:string){
-    const accessTokken=jwt.sign({username,id,pubKey},process.env.ACCESS_TOKEN_PASSWORD as string)
+function generateTokken(username:string,id:number,pubKey:string,firstName:string,lastName:string){
+    const accessTokken=jwt.sign({username,id,pubKey,firstName,lastName},process.env.ACCESS_TOKEN_PASSWORD as string)
     const refreshTokken=jwt.sign({username,id},process.env.REFRESH_TOKEN_PASSWORD as string)
     
     return {accessTokken,refreshTokken}
@@ -70,17 +70,19 @@ const user=await client.user.findFirst({
 if(!user || !user.password) return res.json({message:"No user found"})
     const verified=await bcrypt.compare(password,user.password)
     if(!verified) return res.json({message:"Wrong password"})
-        const {accessTokken,refreshTokken}=generateTokken(user.username,user.id,user.pubKey)
+        const {accessTokken,refreshTokken}=generateTokken(user.username,user.id,user.pubKey,user.firstName,user.lastName)
     const updatedUser=await client.user.update({
         where:{
             id:user.id
         },
         data:{
-            accessTokken,refreshTokken
+            refreshTokken
         }
+        //todo remove accessToken from schema 
     })
 
     if(!updatedUser) return res.status(400).json({message:"Not updated the user"})
+        console.log(accessTokken)
         res.status(200).json({message:"User Signed in",accessTokken})
 
 })

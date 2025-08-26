@@ -15,6 +15,7 @@ import "./Wallet_Standard/RegisterWallet"
 import Connect from './Pages/Connect'
 import Dapp from './Pages/Dapp';
 import Swap from './Pages/Swap';
+import AccountSettting from './Pages/AccountSettting';
 const router=createBrowserRouter([
   {
     path:"/",
@@ -42,6 +43,10 @@ const router=createBrowserRouter([
      {
       path:"/swap",
       element:<Swap />
+     },
+     {
+      path:"/accountSetting",
+      element:<AccountSettting />
      }
         
 

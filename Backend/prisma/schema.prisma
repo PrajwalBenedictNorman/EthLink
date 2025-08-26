@@ -16,5 +16,4 @@ model User{
   privateKey String
   pubKey String
   refreshTokken String?
-  accessTokken String?
 }
