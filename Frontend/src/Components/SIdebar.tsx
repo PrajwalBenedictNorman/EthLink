@@ -2,6 +2,7 @@ import Logo2 from "../Components/Logo2";
 import { useNavigate, } from "react-router";
 import { useState,useEffect } from "react";
 import {jwtDecode} from 'jwt-decode'
+import { ChartColumn,Layers,ArrowLeftRight,Settings } from "lucide-react";
 function SideBar() {
     const [firstName,setFirstName]=useState("")
     const [lastName,setLastName]=useState("")
@@ -41,7 +42,7 @@ function SideBar() {
   return (
     <div>
           {/* SideBar Section */}
-    <div className={`bg-[#1a1d2a] min-h-screen w-[300px]  fixed ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"}`}>
+    <div className={`bg-[#0B0C19] min-h-screen w-[300px]  fixed ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"}`}>
       <div className="mt-4 px-1 flex items-center justify-between">
       <Logo2 />
       <button className="text-white text-xl me-4" onClick={()=>{setVisible(false)}}>&#x25C0;</button>
@@ -50,18 +51,18 @@ function SideBar() {
       
       <div className="mt-10 px-7">
         <h1 className="text-[#636878] font-semibold">Overview</h1>
-        <button className="text-white/65 py-2 flex items-center hover:underline  focus:text-white " onClick={()=>{navigate("/Home")}}><img src="home1.svg" alt="home icon" className="h-5 w-5 me-2" />Dashboard</button>
+        <button className="text-white/65 py-2 flex items-center hover:underline focus:text-white " onClick={()=>{navigate("/Home")}}><ChartColumn className="h-5 w-5 me-2"/>Dashboard</button>
       </div>
       
     <div className="mt-10 px-7">
       <h1 className="text-[#636878] font-semibold">Functions</h1>
-      <button className="text-white/65 py-2 flex items-center  hover:underline focus:text-white" onClick={()=>{navigate("/dapp")}}><img src="market.png" alt="home icon" className="h-5 w-5  me-2" />Dapp</button> <br />
-      <button className="text-white/65 py-2 flex items-center hover:underline focus:text-white" onClick={()=>{navigate("/swap")}}><img src="swap.png" alt="home icon" className="h-5 w-5  me-2" />Swaps</button>
+      <button className="text-white/65 py-2 flex items-center  hover:underline focus:text-white" onClick={()=>{navigate("/dapp")}}><Layers className="h-5 w-5 me-2"/>Dapp</button> <br />
+      <button className="text-white/65 py-2 flex items-center hover:underline focus:text-white" onClick={()=>{navigate("/swap")}}><ArrowLeftRight className="h-5 w-5 me-2"/>Swaps</button>
     </div>
 
     <div className="mt-10 px-7">
     <h1 className="text-[#636878] font-semibold">Settings</h1>
-    <button className="text-white/65 py-4 flex items-center hover:underline focus:text-white" onClick={()=>{navigate("/accountSetting")}}><img src="setting.svg" alt="home icon" className="h-5 w-5 me-2" /> Account Settings</button>
+    <button className="text-white/65 py-4 flex items-center hover:underline focus:text-white" onClick={()=>{navigate("/accountSetting")}}><Settings className="h-5 w-5 me-2"/>Account Settings</button>
     </div>
     <div className="mt-48">
         <div className="flex-grow h-px bg-gray-300 "></div>

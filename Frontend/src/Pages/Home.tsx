@@ -4,6 +4,8 @@ import axios from "axios";
 import Button from "../Components/Button";
 import { useNavigate } from "react-router";
 import SideBar from "../Components/SIdebar";
+import Navbar from "../Components/Navbar";
+import { ArrowUpRight,ArrowDownRight,Wallet,TrendingUp,Activity } from "lucide-react";
 function Home() {
 
   type TokenPayload = {
@@ -167,30 +169,61 @@ async function sendTansaction(){
   // )
   return(
     <>
-    <SideBar />
-     {/* Main DAashboard */}
-    <div className="ms-[321px]">
-      <div className="flex items-center justify-between mt-24">
-          <div className=" px-24">
-          <h1 className="text-white/55 text-5xl font-light "> Balance</h1>
-          <p className="text-white mt-9 text-2xl">{Balance} ETH</p>
-         </div>
-         <div>
-          <h1 className="text-white/55 me-24">Current Gas Price ...</h1>
-          <p className="text-white mt-9 ">{gasPrice} ETH</p>
-         </div>
-      </div>
-    
+    <div className="bg-[#0B0C19]/65 h-[120vh] w-screen">
+      <SideBar />
+      <Navbar />
 
-      <div className="flex items-center mt-18 ms-24">
-        <Button variant="primary" content="Send" className="px-6 me-2" onClick={()=>{}}/>
-        <Button variant="primary" content="Receive" className="px-6 ms-2" onClick={()=>{}}/>
+      {/* Hero Section */}
+      <div className="text-center text-white mt-20 flex flex-col items-center justify-center">
+        <h1 className="text-white/65 text-4xl py-2">Balance</h1>
+        <p className="text-6xl py-2 font-bold">0 ETH</p>
+        <div className="flex items-center justify-center mt-10">
+        <Button content="Send" variant="tertiary" onClick={()=>{}} frontIcon={<ArrowUpRight className="h-4 w-4"/>} className="px-8 ms-4 me-4"/>
+        <Button content="Receive" variant="quaternary" frontIcon={<ArrowDownRight className="h-4 w-4"/>} onClick={()=>{}} className="px-8 ms-4 me-4"/>
+        </div>
       </div>
-
-      <div className="mt-24 px-24">
-        <h1 className="text-white text-xl">Transaction History</h1>
+      {/* Cards */}
+      <div className="ms-[22vw] mt-10">
+        <div className="grid grid-cols-3 gap-6">
+          <div className="bg-[#0B0C19] h-40 w-85 rounded-xl  border-2 border-[#1A1B28]">
+            <div className="flex items-center justify-start mt-4">
+              <Wallet size={32} className="text-[#3C83F6] p-1 ms-4 me-1 bg-[#202132] rounded-md"/>
+              <p className="text-white ms-1 me-2">Portfolio Value</p>
+            </div>
+            <p className="text-white font-bold text-2xl py-2 px-4">$0.00</p>
+            <p className="text-white/45 px-4">+0.00% (24h)</p>
+          </div>
+          <div className="bg-[#0B0C19] h-40 w-85 rounded-xl  border-2 border-[#1A1B28]">
+            <div className="flex items-center justify-start mt-4">
+              <TrendingUp size={32} className="text-purple-500 p-1 ms-4 me-1 bg-[#202132] rounded-md"/>
+              <p className="text-white ms-1 me-2">Total Transactions</p>
+            </div>
+            <p className="text-white font-bold text-2xl py-2 px-4">0</p>
+            <p className="text-white/45 px-4">All time</p>
+          </div>
+          <div className="bg-[#0B0C19] h-40 w-85 rounded-xl  border-2 border-[#1A1B28]">
+            <div className="flex items-center justify-start mt-4">
+              <Activity size={32} className="text-[#3C83F6] p-1 ms-4 me-1 bg-[#202132] rounded-md"/>
+              <p className="text-white ms-1 me-2">Network Status</p>
+            </div>
+            <p className="text-green-500 font-bold text-2xl py-2 px-4">Active</p>
+            <p className="text-white/45 px-4">Ethereum Mainnet</p>
+          </div>
+        </div>
+        {/* Transaction History Card */}
+        <div className="bg-[#0B0C19] h-85 w-[77vw] mt-4 border-2 border-[#1A1B28] rounded-xl ">
+          <h1 className="font-bold text-xl text-white px-4 py-2">
+            Transaction History
+          </h1>
+          <div className=" flex flex-col items-center justify-between mt-10">
+            <Activity size={48} className="text-white/55 "/>
+            <p className="text-white/55 py-3 ">No transaction yet</p>
+            <p className="text-white/55">Your transaction history will appear here once you start using EthLink</p>
+          </div>
+        </div>  
       </div>
     </div>
+     
     </>
   )
 }
