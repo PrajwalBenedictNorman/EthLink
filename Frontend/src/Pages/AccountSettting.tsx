@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import SideBar from '../Components/SIdebar'
-import { User2,Lock,Trash2,Key,Link } from 'lucide-react'
+import { User2,Lock,Trash2,Key,Link, User, Shield } from 'lucide-react'
 import Button from '../Components/Button'
 import { jwtDecode } from 'jwt-decode'
+import Navbar from '../Components/Navbar'
 
 
 interface TokenPayload{
@@ -19,13 +20,13 @@ function AccountSettting() {
     const [email,setEmail]=useState("")
     const [activeTab,setActiveTab]=useState("basic")
     const [acitveStauts,setActiveStatus]=useState("Disabled")
-    useEffect(()=>{
-        const accessTokken=sessionStorage.getItem("accessTokken") as string
-        const decoded=jwtDecode<TokenPayload>(accessTokken)
-        setFirstName(decoded.firstName)
-        setLastName(decoded.lastName)
-        setUsername(decoded.username)
-    },[])
+    // useEffect(()=>{
+    //     const accessTokken=sessionStorage.getItem("accessTokken") as string
+    //     const decoded=jwtDecode<TokenPayload>(accessTokken)
+    //     setFirstName(decoded.firstName)
+    //     setLastName(decoded.lastName)
+    //     setUsername(decoded.username)
+    // },[])
 
     function sumit(){
 
@@ -33,86 +34,78 @@ function AccountSettting() {
 
     
   return (
-    <div>
-      <SideBar />
-      <div className='flex justify-center'>
-        <div className='bg-[#1a2234] h-[83vh] w-[20vw] mt-14 rounded-2xl ms-[20vw] text-white/85'>
-            <div className='flex flex-col gap-2 justify-start ms-10 mt-10'>
-                <button className='flex cursor-pointer hover:underline-offset-2 hover:underline py-9' onClick={()=>setActiveTab("basic")}>
-                     <User2 />
-                    <h1 className='text-md font-semibold px-1'>Basic Information</h1>
-                </button>
-                <button className='flex cursor-pointer hover:underline-offset-2 hover:underline py-9' onClick={()=>setActiveTab("password")}>
-                     <Lock />
-                    <h1 className='text-md font-semibold px-1'>Password</h1>
-                </button>             
-                <button className='flex cursor-pointer hover:underline-offset-2 hover:underline py-9' onClick={()=>setActiveTab("wallets")}>
-                     <Link />
-                    <h1 className='text-md font-semibold px-1'>Connected Wallets</h1>
-                </button>      
-                <button className='flex cursor-pointer hover:underline-offset-2 hover:underline py-9' onClick={()=>setActiveTab("blockChain")}>
-                     <Key />
-                    <h1 className='text-md font-semibold px-1'>BlockChain</h1>
-                </button>      
-                <button className='flex cursor-pointer hover:underline-offset-2 hover:underline py-9' onClick={()=>setActiveTab("delete")}>
-                     <Trash2 />
-                    <h1 className='text-md font-semibold px-1'>Delete Account</h1>
-                </button>      
-            </div>
-         </div>
-        <div>
-            {/* Right top */}
-            <div className='bg-[#202a3b] h-[20vh] w-[50vw] mt-14 ms-10 rounded-2xl text-white/55'>
-                {/* Basic Informantion Details */}
-               {activeTab==="basic" && <div className='text-center py-2'>
-                    <button className='bg-white rounded-full h-12 w-12'></button>
-                    <h1 className='text-xl font-semibold'>{`${firstName} ${lastName}`}</h1>
-                    <div className='flex justify-between'>
-                        <h1 className='ms-10'>Profile Completion</h1>
-                        <h1 className='me-10'>Joined</h1>
-                    </div>
+    <>
+        <SideBar />
+        <Navbar />
+        <div className='bg-[#0B0C19]/65 h-[200vh] w-full'>
+        <div className='ms-[27vw] py-1'>
+            <h1 className='text-white font-bold text-3xl mt-10'>Account Settings</h1>
+            <p className='text-white/45 py-2'>Manage your account preferences and security settings</p>
+            
+            <div className='flex items-start'>
+
+             {/* left Section */}
+            <div className='grid grid-cols-1 gap-3'>
+            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border border-white/10  '>
+            <div className='px-5 py-3'>
+                <div className='flex items-center justify-start '>
+                    <User className='text-blue-500'/>
+                    <h1 className='text-white text-xl font-bold px-2'>Profile Information</h1>
                 </div>
-                } 
-                {activeTab==='password' && <div className='py-8'>
-                    <div className='flex justify-center'>
-                        <div>
-                            <h1 className='px-14'>Password Strength</h1>
-
-                        </div>
-                        <div>
-                             <h1 className='px-14'>Two Factor Authentication : <span className='text-red-400'>{acitveStauts}</span></h1>
-                            <button></button>
-                        </div>
+                <div className='flex items-center justify-between'>
+                    <div>
+                    <p className='text-white/85 mt-9 '>First Name</p>
+                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-3' placeholder='FirstName'/>
                     </div>
-
-                    </div>}
-                {activeTab==='wallets' && <div>This is for wallet</div>}
-                {activeTab==='blockChain' && <div>This is for blockChain</div>}
-                {activeTab==='delete' && <div>This is for delete</div>}    
-
+                    <div className=''>
+                    <p className='text-white/85 mt-9 '>Last Name</p>
+                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-3' placeholder='LastName'/>
+                    </div>
+            
+                </div>
+                <p className='text-white/85 mt-5 '>Wallet Name</p>
+                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-3' placeholder='My Ethereum Wallet'/>
+                <p className='text-white/85 mt-5 '>Email Address</p>
+                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-3' placeholder='your.email@example.com'/>
+                <Button content='Save Changes' variant='tertiary' onClick={()=>{}} className='mt-5'/>
+            </div>
             </div>
 
-            {/* Right bottom */}
-            <div className='bg-[#151d2a] h-[60vh] w-[50vw] mt-6 ms-10 rounded-2xl text-white/85'>
-                {/* Basic Information */}
-                {activeTab==="basic" && <div className='py-6 ms-10'>
-                    <h1>Edit Your account details</h1>
-                    <input type="text" className="bg-[#1c2536] text-white placeholder-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[22vw] mt-6" placeholder='First Name' value={firstName}/>
-                    <input type="text" className="bg-[#1c2536] text-white placeholder-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[22vw] mt-6 ms-9" onClick={()=>setActiveTab("basic")} placeholder='Last Name' value={lastName}/>
-                    <input type="text" className="bg-[#1c2536] text-white placeholder-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[45vw] mt-6 " placeholder='Username' value={username}/>
-                    <input type="text" className="bg-[#1c2536] text-white placeholder-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[45vw] mt-6 " placeholder='Email'/>
-                    <h1 className='mt-6'>Upload Image</h1> 
-                    <button>upload here</button>
-                    <Button content='Make Changes' variant='primary' onClick={sumit} className='ms-[18vw] mt-10'/>
-                </div>}
-                {activeTab==='password' && <div>This is for password</div>}
-                {activeTab==='wallets' && <div>This is for wallet</div>}
-                {activeTab==='blockChain' && <div>This is for blockChain</div>}
-                {activeTab==='delete' && <div>This is for delete</div>}    
+            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border-2 border-white/10  '>
+                <div className='px-5 py-3'>
+                    <div className='flex items-center justify-start '>
+                    <Shield className='text-blue-500'/>
+                    <h1 className='text-white text-xl font-bold px-2'>Security</h1>
+                </div>
+                <div className='flex items-center justify-between'>
+                    <p className='text-white/85'>Seed Phrase</p>
+                    <Button content='Show' variant='quaternary' onClick={()=>{}}/>
+                </div>
+                </div>
+            </div>
+            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border-2 border-white/10  '>
+                svdfs
+            </div>
+            </div>
+
+            {/* Right Section */}
+            <div className='grid grid-cols-1 gap-5 px-10 mt-4'>
+                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 ' >
+
+                </div>
+                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl  border border-white/10 ' >
+
+                </div>
+                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 ' >
+
+                </div>
+            </div>
+
+
             </div>
         </div>
-      </div>
-    </div>
+        </div>
+    </>
   )
 }
 
