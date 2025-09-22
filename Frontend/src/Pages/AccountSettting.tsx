@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SideBar from '../Components/SIdebar'
-import { User2,Lock,Trash2,Key,Link, User, Shield } from 'lucide-react'
+import { User2,Lock,Trash2,Key,Link, User, Shield,Eye } from 'lucide-react'
 import Button from '../Components/Button'
 import { jwtDecode } from 'jwt-decode'
 import Navbar from '../Components/Navbar'
@@ -77,10 +77,11 @@ function AccountSettting() {
                     <Shield className='text-blue-500'/>
                     <h1 className='text-white text-xl font-bold px-2'>Security</h1>
                 </div>
-                <div className='flex items-center justify-between'>
+                <div className='flex items-center justify-between py-4'>
                     <p className='text-white/85'>Seed Phrase</p>
-                    <Button content='Show' variant='quaternary' onClick={()=>{}}/>
+                    <Button content='Show' variant='quaternary' onClick={()=>{}} frontIcon={<Eye />}/>
                 </div>
+                <p className='bg-[#171826] w-full h-15 rounded-xl text-white/65 text-center py-5'>Click 'Show' to revel the seed phase</p>
                 </div>
             </div>
             <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border-2 border-white/10  '>
