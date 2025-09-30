@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SideBar from '../Components/SIdebar'
-import { User2,Lock,Trash2,Key,Link, User, Shield,Eye,Tablet, Bell } from 'lucide-react'
+import { User2,Lock,Trash2,Key,Link, User, Shield,Eye,Tablet, Bell, Download, Globe } from 'lucide-react'
 import Button from '../Components/Button'
 import { jwtDecode } from 'jwt-decode'
 import Navbar from '../Components/Navbar'
@@ -154,14 +154,35 @@ function AccountSettting() {
 
             {/* Right Section */}
             <div className='grid grid-cols-1 gap-5 px-10 mt-4'>
-                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 ' >
+                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 py-3 px-5' >
                     <h1 className='font-bold text-white'>Quick Actions</h1>
+                    <div className='px-2 py-4 grid grid-cols-1 gap-4'>
+                        <Button variant='quaternary' content='Export Private Key' onClick={()=>{}} frontIcon={<Download className='h-4 w-4'/>} className='text-sm'/>
+                        <Button variant='quaternary' content='Network Settings' onClick={()=>{}} frontIcon={<Globe className='h-4 w-4'/>} className='text-sm'/>
+                        <Button variant='quaternary' content='Contact Support' onClick={()=>{}} frontIcon={<User className='h-4 w-4'/>} className='text-sm'/>
+                    </div>
                 </div>
-                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl  border border-white/10 ' >
-
+                <div className='bg-[#0B0C19] h-[25vh] w-[20vw] rounded-xl  border border-white/10 py-3 px-5' >
+                    <h1 className='text-bold text-white '>Wallet Information</h1>
+                    <div className='px-4 py-5 grid grid-cols-1 gap-4'>
+                        <div className='flex items-center justify-between'>
+                            <p className='text-sm text-white/45'>Address</p>
+                            <p className='text-sm text-white/85'>0x742...7a9c</p>
+                        </div>
+                         <div className='flex items-center justify-between'>
+                            <p className='text-sm text-white/45'>Network</p>
+                            <p className='text-sm text-white/85'>Ethereum Mainnet</p>
+                        </div>
+                         <div className='flex items-center justify-between'>
+                            <p className='text-sm text-white/45'>Created</p>
+                            <p className='text-sm text-white/85'>Oct 30,2025</p>
+                        </div>
+                    </div>
                 </div>
-                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 ' >
-
+                <div className='bg-[#0B0C19] h-[20vh] w-[20vw] rounded-xl border border-red-500  py-3 px-5' >
+                    <h1 className='text-red-500 font-bold'>Danger Zone</h1>
+                    <button className='text-red-400 w-full border border-red-400 rounded-xl py-2 mt-3'><span className='flex items-center justify-start'><Trash2 className='h-4 w-4 text-red-400 me-2 ms-4'/>Delete Wallet</span></button>
+                    <p className='text-white/45 text-xs py-2'>This action cannot be undone. Make sure you have backed up your seed phrase.</p>
                 </div>
             </div>
 
