@@ -3,7 +3,7 @@ import Logo from "../Components/Logo";
 import gsap from 'gsap'
 import {useGSAP} from '@gsap/react'
 import ScrollTrigger from "gsap/ScrollTrigger"
-import { Link, useNavigate } from "react-router";
+import { Link,useNavigate } from "react-router-dom";
 import { useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger)
@@ -85,7 +85,7 @@ function userModal(){
             <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
               Contact
             </Link>
-            <Link to={"/"} className="text-[#636878] ms-8 p-2 hover:underline">
+            <Link to={"/docs"} className="text-[#636878] ms-8 p-2 hover:underline">
               Docs
             </Link>
           </div>

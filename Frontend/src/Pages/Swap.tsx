@@ -1,12 +1,12 @@
 import Button from "../Components/Button"
 import Navbar from "../Components/Navbar"
+import NavSide from "../Components/NavSide"
 import SideBar from "../Components/SIdebar"
 import { ArrowUpDown,TrendingUp, Zap } from "lucide-react"
 function Swap() {
   return (
     <div>
-      <SideBar />
-      <Navbar />
+      <NavSide />
        <div className='bg-[#0B0C19]/65 h-screen w-full flex flex-col items-center'>
        <h1 className="text-3xl font-bold text-white mt-10">Swap Tokens</h1>
        <p className="text-white/55 py-2">Exchange tokens instantly with the best rates</p>

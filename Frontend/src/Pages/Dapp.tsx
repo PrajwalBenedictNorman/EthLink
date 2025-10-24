@@ -3,13 +3,16 @@ import SideBar from '../Components/SIdebar'
 import Navbar from '../Components/Navbar'
 import Button from '../Components/Button'
 import { Zap } from 'lucide-react'
+import NavSide from '../Components/NavSide'
+import { useRecoilValue } from 'recoil'
+import { visibleAtom } from '../store/atom/visible'
 function Dapp() {
+  const visible=useRecoilValue(visibleAtom)
   return (
     <div>
-      <SideBar />
-      <Navbar />
+      <NavSide />
       <div className='bg-[#0B0C19]/65 h-screen w-full'>
-      <div className='ms-[23vw] py-5'>
+      <div className={`${visible?"ms-[20vw]":"ms-[12vw]"} py-5`}>
         <h1 className='text-white text-4xl font-bold py-2'>DApps</h1>
         <p className='text-white/55'>Discover and connect to decentralized applications</p>
         <div className='flex items-center justify-start mt-6'>

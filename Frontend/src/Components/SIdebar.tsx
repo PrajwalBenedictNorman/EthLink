@@ -1,17 +1,19 @@
-import Logo2 from "../Components/Logo2";
-import { useNavigate, } from "react-router";
+import Logo2, { LogoIcon } from "../Components/Logo2";
+import { useNavigate, } from "react-router-dom";
 import { useState,useEffect } from "react";
 import {jwtDecode} from 'jwt-decode'
 import { ChartColumn,Layers,ArrowLeftRight,Settings } from "lucide-react";
+import { useRecoilValue } from "recoil";
+import { visibleAtom } from "../store/atom/visible";
+
 function SideBar() {
     const [firstName,setFirstName]=useState("")
     const [lastName,setLastName]=useState("")
     const [firstChar,setFirstChar]=useState("")
     const [lastChar,setLastChar]=useState("")
-    const [visible,setVisible]=useState(true)
+    const visible=useRecoilValue(visibleAtom)
     let navigate=useNavigate()  
-
-      type TokenPayload = {
+  type TokenPayload = {
   username: string;
   pubKey: string;
   userId:number
@@ -40,13 +42,12 @@ function SideBar() {
  },[firstName,lastName])
 
   return (
-    <div>
+    <>
+      <div>
           {/* SideBar Section */}
-    <div className={`bg-[#0B0C19] min-h-screen w-[300px]  fixed ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-full"}`}>
+    {visible && <div className={`bg-[#0B0C19] min-h-screen w-[260px]  fixed`}>
       <div className="mt-4 px-1 flex items-center justify-between">
       <Logo2 />
-      <button className="text-white text-xl me-4" onClick={()=>{setVisible(false)}}>&#x25C0;</button>
-      
       </div>
       
       <div className="mt-10 px-7">
@@ -74,9 +75,22 @@ function SideBar() {
         </button> 
     </div>
    </div>
-   {!visible && <button className="text-white text-2xl ms-4 mt-4" onClick={()=>setVisible(true)}>&#x25B6;</button>}
+   }
+   {
+    !visible &&
+    <div className="bg-[#0B0C19] min-h-screen w-[90px] fixed border-r-2 border-white/10">
+      <div className="flex flex-col items-center gap-10 mt-6">
+        <LogoIcon />
+        <hr className="border-white/15 -my-5 w-full "/>
+        <ChartColumn className="h-6  w-6  text-white/65" onClick={()=>{navigate("/Home")}}/>
+        <Layers className="h-6 w-6  text-white/65" onClick={()=>{navigate("/dapp")}}/>
+        <ArrowLeftRight className="h-6 w-6 text-white/65" onClick={()=>{navigate("/swap")}}/>
+        <Settings className="h-6 w-6 text-white/65" onClick={()=>{navigate("/accountSetting")}}/>
+      </div>
     </div>
-
+   }
+    </div>
+    </>
   )
 }
 

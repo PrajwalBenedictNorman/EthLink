@@ -16,6 +16,8 @@ import Connect from './Pages/Connect'
 import Dapp from './Pages/Dapp';
 import Swap from './Pages/Swap';
 import AccountSettting from './Pages/AccountSettting';
+import Docs from './Pages/Docs';
+import { RecoilRoot } from 'recoil';
 const router=createBrowserRouter([
   {
     path:"/",
@@ -47,13 +49,18 @@ const router=createBrowserRouter([
      {
       path:"/accountSetting",
       element:<AccountSettting />
+     },
+     {
+      path:"/docs",
+      element:<Docs />
      }
-        
 
 ])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <RecoilRoot>
+      <RouterProvider router={router} />
+    </RecoilRoot>
   </StrictMode>,
 )

@@ -4,6 +4,9 @@ import { User2,Lock,Trash2,Key,Link, User, Shield,Eye,Tablet, Bell, Download, Gl
 import Button from '../Components/Button'
 import { jwtDecode } from 'jwt-decode'
 import Navbar from '../Components/Navbar'
+import NavSide from '../Components/NavSide'
+import { useRecoilValue } from 'recoil'
+import { visibleAtom } from '../store/atom/visible'
 
 
 interface TokenPayload{
@@ -20,6 +23,7 @@ function AccountSettting() {
     const [email,setEmail]=useState("")
     const [activeTab,setActiveTab]=useState("basic")
     const [acitveStauts,setActiveStatus]=useState("Disabled")
+    const visibile=useRecoilValue(visibleAtom)
     // useEffect(()=>{
     //     const accessTokken=sessionStorage.getItem("accessTokken") as string
     //     const decoded=jwtDecode<TokenPayload>(accessTokken)
@@ -35,10 +39,9 @@ function AccountSettting() {
     
   return (
     <>
-        <SideBar />
-        <Navbar />
+        <NavSide />
         <div className='bg-[#0B0C19]/65 h-[200vh] w-full'>
-        <div className='ms-[27vw] py-1'>
+        <div className={`${visibile?"ms-[27vw]":"ms-[22vw]"} py-1`}>
             <h1 className='text-white font-bold text-3xl mt-10'>Account Settings</h1>
             <p className='text-white/45 py-2'>Manage your account preferences and security settings</p>
             
