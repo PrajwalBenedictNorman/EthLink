@@ -45,7 +45,7 @@ function SideBar() {
     <>
       <div>
           {/* SideBar Section */}
-    {visible && <div className={`bg-[#0B0C19] min-h-screen w-[260px]  fixed`}>
+    {visible && <div className={`bg-[#0B0C19] min-h-screen w-[260px] fixed`}>
       <div className="mt-4 px-1 flex items-center justify-between">
       <Logo2 />
       </div>
@@ -78,7 +78,7 @@ function SideBar() {
    }
    {
     !visible &&
-    <div className="bg-[#0B0C19] min-h-screen w-[90px] fixed border-r-2 border-white/10">
+    <div className="bg-[#0B0C19] min-h-screen w-[90px] fixed border-r-2 border-white/10 ">
       <div className="flex flex-col items-center gap-10 mt-6">
         <LogoIcon />
         <hr className="border-white/15 -my-5 w-full "/>

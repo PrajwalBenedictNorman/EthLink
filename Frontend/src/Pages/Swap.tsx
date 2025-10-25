@@ -12,7 +12,7 @@ function Swap() {
        <p className="text-white/55 py-2">Exchange tokens instantly with the best rates</p>
 
        {/* Main card */}
-       <div className="bg-[#11121f] h-[62vh] w-[38vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10">
+       <div className="bg-[#11121f] h-[62vh] md:w-[38vw] w-[90vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10">
         <div className="px-10 py-6">
           <h1 className="text-white text-2xl font-bold py-1">Swap</h1>
           <div className="flex items-center justify-between py-1">
@@ -60,14 +60,14 @@ function Swap() {
 
         {/* Volume Cards */}
         <div className="flex items-center">
-        <div className="bg-[#11121f] h-[10vh] w-[18vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10 me-4">
+        <div className="bg-[#11121f] h-[10vh] md:w-[18vw] w-[40vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10 me-4">
         <div className="flex items-center px-2 py-1">
         <TrendingUp className="text-green-500"/>
         <p className="text-white/75 ms-2">24h Volume</p>
         </div>
         <p className="text-white font-bold px-2 text-xl">$1.5B</p>
         </div>
-        <div className="bg-[#11121f] h-[10vh] w-[18vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10 ms-4">
+        <div className="bg-[#11121f] h-[10vh] md:w-[18vw] w-[40vw] mt-4 rounded-xl shadow-2xl border-2 border-white/10 ms-4">
         <div className="flex items-center px-2 py-1">
           <Zap className="text-blue-500"/>
           <p className="text-white/75 ms-2">Avg. Time</p>

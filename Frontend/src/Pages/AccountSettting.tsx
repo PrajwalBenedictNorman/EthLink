@@ -40,16 +40,16 @@ function AccountSettting() {
   return (
     <>
         <NavSide />
-        <div className='bg-[#0B0C19]/65 h-[200vh] w-full'>
-        <div className={`${visibile?"ms-[27vw]":"ms-[22vw]"} py-1`}>
+        <div className='bg-[#0B0C19]/65 md:h-[200vh] h-[260vh] w-full'>
+        <div className={`${visibile?"md:ms-[27vw]":"md:ms-[22vw]"} py-1 transition-all duration-300 ms-[5vw]`}>
             <h1 className='text-white font-bold text-3xl mt-10'>Account Settings</h1>
             <p className='text-white/45 py-2'>Manage your account preferences and security settings</p>
             
-            <div className='flex items-start'>
+            <div className=' flex flex-col md:flex-row items-start'>
 
              {/* left Section */}
             <div className='grid grid-cols-1 gap-4'>
-            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border border-white/10  '>
+            <div className='bg-[#0B0C19] h-[50vh] md:w-[40vw] w-[90vw] rounded-xl mt-4 border border-white/10  '>
             <div className='px-5 py-4'>
                 <div className='flex items-center justify-start '>
                     <User className='text-blue-500'/>
@@ -74,7 +74,7 @@ function AccountSettting() {
             </div>
             </div>
 
-            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border-2 border-white/10  '>
+            <div className='bg-[#0B0C19] h-[50vh] md:w-[40vw] w-[90vw] rounded-xl mt-4 border-2 border-white/10  '>
                 <div className='px-5 py-4'>
                     <div className='flex items-center justify-start '>
                     <Shield className='text-blue-500'/>
@@ -110,7 +110,7 @@ function AccountSettting() {
 
                 </div>
             </div>
-            <div className='bg-[#0B0C19] h-[50vh] w-[40vw] rounded-xl mt-4 border-2 border-white/10  '>
+            <div className='bg-[#0B0C19] h-[50vh] md:w-[40vw] w-[90vw] rounded-xl mt-4 border-2 border-white/10  '>
             <div className='px-5 py-4'>
                 <div className='flex items-center'>
                     <Bell className='text-blue-500 '/>
@@ -156,8 +156,8 @@ function AccountSettting() {
             </div>
 
             {/* Right Section */}
-            <div className='grid grid-cols-1 gap-5 px-10 mt-4'>
-                <div className='bg-[#0B0C19] h-[30vh] w-[20vw] rounded-xl border border-white/10 py-3 px-5' >
+            <div className='grid grid-cols-1 gap-4 md:gap-5 md:px-10 mt-4'>
+                <div className='bg-[#0B0C19] h-[30vh] md:w-[20vw] w-[90vw] rounded-xl border border-white/10 py-3 px-5' >
                     <h1 className='font-bold text-white'>Quick Actions</h1>
                     <div className='px-2 py-4 grid grid-cols-1 gap-4'>
                         <Button variant='quaternary' content='Export Private Key' onClick={()=>{}} frontIcon={<Download className='h-4 w-4'/>} className='text-sm'/>
@@ -165,7 +165,7 @@ function AccountSettting() {
                         <Button variant='quaternary' content='Contact Support' onClick={()=>{}} frontIcon={<User className='h-4 w-4'/>} className='text-sm'/>
                     </div>
                 </div>
-                <div className='bg-[#0B0C19] h-[25vh] w-[20vw] rounded-xl  border border-white/10 py-3 px-5' >
+                <div className='bg-[#0B0C19] h-[25vh] md:w-[20vw] w-[90vw] rounded-xl  border border-white/10 py-3 px-5' >
                     <h1 className='text-bold text-white '>Wallet Information</h1>
                     <div className='px-4 py-5 grid grid-cols-1 gap-4'>
                         <div className='flex items-center justify-between'>
@@ -182,7 +182,7 @@ function AccountSettting() {
                         </div>
                     </div>
                 </div>
-                <div className='bg-[#0B0C19] h-[20vh] w-[20vw] rounded-xl border border-red-500  py-3 px-5' >
+                <div className='bg-[#0B0C19] h-[20vh] md:w-[20vw] w-[90vw] rounded-xl border border-red-500  py-3 px-5' >
                     <h1 className='text-red-500 font-bold'>Danger Zone</h1>
                     <button className='text-red-400 w-full border border-red-400 rounded-xl py-2 mt-3'><span className='flex items-center justify-start'><Trash2 className='h-4 w-4 text-red-400 me-2 ms-4'/>Delete Wallet</span></button>
                     <p className='text-white/45 text-xs py-2'>This action cannot be undone. Make sure you have backed up your seed phrase.</p>
