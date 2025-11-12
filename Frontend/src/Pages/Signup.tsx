@@ -8,6 +8,7 @@ function Signup() {
   const [firstName,setFirstName]=useState("")
   const [lastName,setLastName]=useState("")
   const [username,setUsername]=useState("")
+  const [email,setEmail]=useState("")
   const [password,setPassword]=useState("")
   const navigate=useNavigate()
 
@@ -37,6 +38,8 @@ function Signup() {
             <input type="text" placeholder="Last Name" className="text-white px-4 py-2 rounded bg-[#272b3e7c]  w-full md:w-fit md:ms-2" onChange={(e)=>setLastName(e.target.value)}/>
            </div>
           <input type="text" placeholder="Username" className="text-white px-4 py-2 rounded bg-[#272b3e7c] mt-4 w-full" onChange={(e)=>setUsername(e.target.value)}/>
+          <br />
+          <input type="text" placeholder="Email" className="text-white px-4 py-2 rounded bg-[#272b3e7c] mt-4 w-full" onChange={(e)=>setEmail(e.target.value)}/>
           <br />
           <input type="password" placeholder="Enter your password" className="text-white px-4 py-2.5 rounded bg-[#272b3e7c] mt-4 w-full" onChange={(e)=>setPassword(e.target.value)}/>
           <br />

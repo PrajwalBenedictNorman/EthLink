@@ -16,4 +16,7 @@ model User{
   privateKey String
   pubKey String
   refreshTokken String?
+  email String
+  wallet_name String @unique
+  verification Boolean @default(false)
 }

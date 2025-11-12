@@ -52,10 +52,11 @@ const zod_1 = __importStar(require("zod"));
 const eth_wallet_1 = __importDefault(require("./eth_wallet"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const auth_1 = require("./middleware/auth");
+const auth_1 = require("./middleware /auth");
 const alchemy_sdk_1 = require("alchemy-sdk");
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const ethers_1 = require("ethers");
+const wallet_name_1 = __importDefault(require("./wallet_name"));
 exports.userRouter = (0, express_1.Router)();
 const client = new client_1.PrismaClient();
 const provider = new ethers_1.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
@@ -63,19 +64,20 @@ const userSignupSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password: zod_1.default.string(),
     firstName: zod_1.default.string(),
-    lastName: (0, zod_1.string)()
+    lastName: (0, zod_1.string)(),
+    email: (0, zod_1.string)().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email out of order")
 });
 const userSigninSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password: zod_1.default.string()
 });
-client.$use((params, next) => __awaiter(void 0, void 0, void 0, function* () {
-    if (params.model == 'User')
-        if (params.action == 'create' || params.action == 'update')
-            if (params.args.data.password)
-                params.args.data.password = yield bcrypt_1.default.hash(params.args.data.password, 10);
-    return next(params);
-}));
+// client.$use(async(params,next)=>{
+//     if(params.model=='User')
+//         if(params.action=='create' || params.action=='update')
+//             if (params.args.data.password)
+//                 params.args.data.password=await bcrypt.hash(params.args.data.password,10)
+//     return next(params)
+// })
 function generateTokken(username, id, pubKey, firstName, lastName) {
     const accessTokken = jsonwebtoken_1.default.sign({ username, id, pubKey, firstName, lastName }, process.env.ACCESS_TOKEN_PASSWORD);
     const refreshTokken = jsonwebtoken_1.default.sign({ username, id }, process.env.REFRESH_TOKEN_PASSWORD);
@@ -87,10 +89,12 @@ exports.userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 
         return res.status(400).json({ message: "No response" });
     }
     const { privateKey, pubKey } = yield (0, eth_wallet_1.default)();
-    const { username, password, firstName, lastName } = resp.data;
+    const { username, password, firstName, lastName, email } = resp.data;
     if (!privateKey || !pubKey)
         return res.json({ message: "the key pair not generated" });
-    const user = yield client.user.create({ data: { username, password, firstName, lastName, privateKey, pubKey } });
+    const wallet_name = (0, wallet_name_1.default)();
+    const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+    const user = yield client.user.create({ data: { username, password: hashedPassword, firstName, lastName, privateKey, pubKey, email, wallet_name } });
     if (!user)
         return res.status(400).json({ message: "User not created" });
     res.status(200).json({ message: "User Created" });
@@ -125,6 +129,27 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
         return res.status(400).json({ message: "Not updated the user" });
     console.log(accessTokken);
     res.status(200).json({ message: "User Signed in", accessTokken });
+}));
+exports.userRouter.post("/userDetails", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.id;
+    try {
+        const user = yield client.user.findFirst({
+            where: {
+                id
+            }, select: {
+                firstName: true,
+                lastName: true,
+                email: true,
+                wallet_name: true
+            }
+        });
+        if (!user)
+            return res.status(404).json({ message: "User not found" });
+        return res.status(200).json({ user });
+    }
+    catch (error) {
+        console.log(error);
+    }
 }));
 exports.userRouter.post("/signAndSendTransaction", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.id;

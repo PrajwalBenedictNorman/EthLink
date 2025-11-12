@@ -71,7 +71,7 @@ function SideBar() {
          <div className="w-16 h-16 rounded-full bg-[#1F1F2E] text-white flex items-center justify-center text-xl font-semibold">
           {firstChar}{lastChar}
         </div>
-        <h1 className="text-white text-xl ">{firstName} {lastName}</h1>
+        <h1 className="text-white text-xl ms-3">{firstName} {lastName}</h1>
         </button> 
     </div>
    </div>
@@ -87,6 +87,14 @@ function SideBar() {
         <ArrowLeftRight className="h-6 w-6 text-white/65" onClick={()=>{navigate("/swap")}}/>
         <Settings className="h-6 w-6 text-white/65" onClick={()=>{navigate("/accountSetting")}}/>
       </div>
+      <div className="mt-[40vh]">
+        <div className="flex-grow h-px bg-gray-300 "></div>
+        <button className="flex items-center mt-4 px-4 cursor-pointer">
+         <div className="w-16 h-16 rounded-full bg-[#1F1F2E] text-white flex items-center justify-center text-xl font-semibold">
+          {firstChar}{lastChar}
+        </div>
+        </button> 
+    </div>
     </div>
    }
     </div>

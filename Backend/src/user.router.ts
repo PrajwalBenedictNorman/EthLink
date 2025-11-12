@@ -4,10 +4,11 @@ import z, { string } from 'zod'
 import generateKeyPair from "./eth_wallet";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { authentication, Logging } from "./middleware/auth";
+import { authentication, Logging } from "./middleware /auth";
 import { Wallet,Utils,Alchemy,Network, TransactionRequest } from "alchemy-sdk";
 import CryptoJS from 'crypto-js'
 import { Transaction,hexlify,JsonRpcProvider } from "ethers";
+import generateName from "./wallet_name";
 
 
 
@@ -19,21 +20,22 @@ const userSignupSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password:z.string(),
     firstName:z.string(),
-    lastName:string()
+    lastName:string(),
+    email:string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email out of order")
 })
 const userSigninSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password:z.string()
 })
-client.$use(async(params,next)=>{
-    if(params.model=='User')
-        if(params.action=='create' || params.action=='update')
-            if (params.args.data.password)
-                params.args.data.password=await bcrypt.hash(params.args.data.password,10)
+// client.$use(async(params,next)=>{
+//     if(params.model=='User')
+//         if(params.action=='create' || params.action=='update')
+//             if (params.args.data.password)
+//                 params.args.data.password=await bcrypt.hash(params.args.data.password,10)
 
 
-    return next(params)
-})
+//     return next(params)
+// })
 
 
 function generateTokken(username:string,id:number,pubKey:string,firstName:string,lastName:string){
@@ -49,9 +51,11 @@ const resp=userSignupSchema.safeParse(req.body)
 if(!resp.success) {return res.status(400).json({message:"No response"})}
 
 const {privateKey,pubKey}=await generateKeyPair()
-const {username,password,firstName,lastName}=resp.data
+const {username,password,firstName,lastName,email}=resp.data
 if (!privateKey || !pubKey) return res.json({message:"the key pair not generated"})
-    const user=await client.user.create({data:{username,password,firstName,lastName,privateKey,pubKey}})
+    const wallet_name=generateName();
+    const hashedPassword =await bcrypt.hash(password,10)
+    const user=await client.user.create({data:{username,password:hashedPassword,firstName,lastName,privateKey,pubKey,email,wallet_name}})
     if(!user) return res.status(400).json({message:"User not created"})
      res.status(200).json({message:"User Created"})
 })
@@ -86,6 +90,30 @@ if(!user || !user.password) return res.json({message:"No user found"})
         res.status(200).json({message:"User Signed in",accessTokken})
 
 })
+
+userRouter.post("/userDetails",authentication,async(req:Logging,res):Promise<any>=>{
+    const id=req.id
+    try {
+        const user=await client.user.findFirst({
+            where:{
+                id
+            },select:{
+                firstName:true,
+                lastName:true,
+                email:true,
+                wallet_name:true
+            }
+        })
+        if (!user) return res.status(404).json({message:"User not found"})
+            return res.status(200).json({user})
+    } catch (error) {
+        console.log(error)
+    }
+})  
+
+
+
+
 
  userRouter.post("/signAndSendTransaction",authentication,async (req:Logging,res):Promise<any>=>{
         const id=req.id

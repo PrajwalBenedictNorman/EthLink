@@ -7,7 +7,7 @@ import Navbar from '../Components/Navbar'
 import NavSide from '../Components/NavSide'
 import { useRecoilValue } from 'recoil'
 import { visibleAtom } from '../store/atom/visible'
-
+import axios from "axios"
 
 interface TokenPayload{
     firstName:string,
@@ -19,18 +19,35 @@ interface TokenPayload{
 function AccountSettting() {
     const [firstName,setFirstName]=useState("")
     const [lastName,setLastName]=useState("")
-    const [username,setUsername]=useState("")
     const [email,setEmail]=useState("")
+    const [walletName,setWalletName]=useState("")
     const [activeTab,setActiveTab]=useState("basic")
     const [acitveStauts,setActiveStatus]=useState("Disabled")
     const visibile=useRecoilValue(visibleAtom)
-    // useEffect(()=>{
-    //     const accessTokken=sessionStorage.getItem("accessTokken") as string
-    //     const decoded=jwtDecode<TokenPayload>(accessTokken)
-    //     setFirstName(decoded.firstName)
-    //     setLastName(decoded.lastName)
-    //     setUsername(decoded.username)
-    // },[])
+
+    async function getDetails(){
+        try {
+        const accessTokken=sessionStorage.getItem("accessTokken") as string
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/userDetails`,{},{
+            headers:{
+                authorization:accessTokken
+            }
+        })
+        if(!user) return alert("user not found")
+        
+        setFirstName(user.data.user.firstName)
+        setLastName(user.data.user.lastName)
+        setEmail(user.data.user.email)
+        setWalletName(user.data.user.wallet_name)
+        
+        } catch (error) {
+            
+        }
+       
+    }
+    useEffect(()=>{
+        getDetails()
+    })
 
     function sumit(){
 
@@ -58,19 +75,18 @@ function AccountSettting() {
                 <div className='flex items-center justify-between'>
                     <div>
                     <p className='text-white/85 mt-9 '>First Name</p>
-                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='FirstName'/>
+                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='FirstName' value={firstName}/>
                     </div>
                     <div className=''>
                     <p className='text-white/85 mt-9 '>Last Name</p>
-                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='LastName'/>
+                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='LastName' value={lastName}/>
                     </div>
             
                 </div>
                 <p className='text-white/85 mt-5 '>Wallet Name</p>
-                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='My Ethereum Wallet'/>
+                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{walletName}</p>
                 <p className='text-white/85 mt-5 '>Email Address</p>
-                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='your.email@example.com'/>
-                <Button content='Save Changes' variant='tertiary' onClick={()=>{}} className='mt-5'/>
+                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='your.email@example.com' value={email}/>
             </div>
             </div>
 

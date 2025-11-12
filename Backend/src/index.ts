@@ -9,4 +9,6 @@ app.use(cors())
 app.use(express.json())
 app.use("/user",userRouter)
 
-app.listen(process.env.PORT)
+app.listen(process.env.PORT,()=>{
+    console.log('Server is running')
+})
