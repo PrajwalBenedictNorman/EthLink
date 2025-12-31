@@ -20,7 +20,7 @@ function Signin() {
         const username=usernameRef.current?.value
         const password=passwordRef.current?.value
         console.log(username,password)
-        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/signin`,{username,password})
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signin`,{username,password})
         if (!user?.data?.accessTokken) {
         alert("User not found");
         return;
