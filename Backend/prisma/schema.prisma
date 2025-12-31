@@ -1,10 +1,9 @@
-generator client {
+ generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User{
@@ -16,7 +15,24 @@ model User{
   privateKey String
   pubKey String
   refreshTokken String?
-  email String
+  email String @unique
   wallet_name String @unique
-  verification Boolean @default(false)
+  twoSetAuth Boolean @default(false)
+  verification Boolean?
+  seed Seed?
+  createdAt DateTime @default(now())
+}
+
+model Seed{
+  id Int @id @default(autoincrement())
+  userId Int @unique  
+  encryptedSeed String 
+  password String
+  salt String
+  iv String
+  backupReady Boolean @default(true)
+  viewed Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
 }

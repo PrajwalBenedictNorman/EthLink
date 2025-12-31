@@ -75,18 +75,18 @@ function AccountSettting() {
                 <div className='flex items-center justify-between'>
                     <div>
                     <p className='text-white/85 mt-9 '>First Name</p>
-                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='FirstName' value={firstName}/>
+                    <p className='bg-[#171826] mt-2 w-[13vw] rounded-xl border border-white/10 h-9 text-white/45 px-4 flex items-center'>{firstName || 'FirstName'}</p>
                     </div>
                     <div className=''>
                     <p className='text-white/85 mt-9 '>Last Name</p>
-                    <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='LastName' value={lastName}/>
+                    <p  className='bg-[#171826] mt-2 w-[13vw] rounded-xl border border-white/10 h-9 text-white/45 px-4 flex items-center'>{lastName}</p>
                     </div>
             
                 </div>
                 <p className='text-white/85 mt-5 '>Wallet Name</p>
                 <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{walletName}</p>
                 <p className='text-white/85 mt-5 '>Email Address</p>
-                <input type="text" className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4' placeholder='your.email@example.com' value={email}/>
+                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{email}</p>
             </div>
             </div>
 

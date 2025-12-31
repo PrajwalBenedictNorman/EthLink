@@ -49,7 +49,6 @@ exports.userRouter = void 0;
 const client_1 = require("@prisma/client");
 const express_1 = require("express");
 const zod_1 = __importStar(require("zod"));
-const eth_wallet_1 = __importDefault(require("./eth_wallet"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("./middleware /auth");
@@ -64,6 +63,8 @@ const userSignupSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password: zod_1.default.string(),
     firstName: zod_1.default.string(),
+    privateKey: zod_1.default.string(),
+    pubKey: zod_1.default.string(),
     lastName: (0, zod_1.string)(),
     email: (0, zod_1.string)().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email out of order")
 });
@@ -88,8 +89,7 @@ exports.userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 
     if (!resp.success) {
         return res.status(400).json({ message: "No response" });
     }
-    const { privateKey, pubKey } = yield (0, eth_wallet_1.default)();
-    const { username, password, firstName, lastName, email } = resp.data;
+    const { username, password, firstName, lastName, email, pubKey, privateKey } = resp.data;
     if (!privateKey || !pubKey)
         return res.json({ message: "the key pair not generated" });
     const wallet_name = (0, wallet_name_1.default)();

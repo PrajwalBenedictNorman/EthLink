@@ -1,6 +1,6 @@
 import { generateMnemonic,mnemonicToSeed } from "bip39";
 import { Wallet,HDNodeWallet } from "ethers";                 
-import CryptoJS from 'crypto-js'
+import * as CryptoJS from 'crypto-js'
 
 async function generateKeyPair(){
     const mnemonic=generateMnemonic()
@@ -11,8 +11,8 @@ async function generateKeyPair(){
     const privaKey=child.privateKey
     const wallet= new Wallet(privaKey)
     const pubKey=wallet.address
-    const privateKey=CryptoJS.AES.encrypt(privaKey,process.env.CRYPTO_KEY as string).toString()
-    return {privateKey,pubKey}
+    const privateKey=CryptoJS.AES.encrypt(privaKey,import.meta.env.VITE_CRYPTO_KEY as string).toString()
+    return {privateKey,pubKey,mnemonic}
 }
 
-export default generateKeyPair  
+export default generateKeyPair      

@@ -105,7 +105,7 @@ function userModal(){
       <div className="mt-44 text-center hero-title opacity-0">
         <h1 className="text-8xl text-white font-extrabold">Your Modern</h1>
         <h1 className="text-6xl text-white mt-4">
-          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 text-transparent bg-clip-text font-bold">
+          <span className="md:bg-linear-to-br from-purple-400 via-pink-500 to-blue-500 text-transparent bg-clip-text font-bold">
             Crypto
           </span>{" "}
           Wallet
@@ -118,7 +118,7 @@ function userModal(){
            <Button
           variant="primary"
           content="Get Started"
-          className="bg-gradient-to-tr from-violet-600 via-indigo-500 to-blue-500 text-white text-xl px-8 py-3  rounded-2xl  mt-8 hover:from-indigo-400 hover:to-violet-300 hover:transition-all duration-700"
+          className="bg-linear-to-tr from-violet-600 via-indigo-500 to-blue-500 text-white text-xl px-8 py-3  rounded-2xl  mt-8 hover:from-indigo-400 hover:to-violet-300 hover:transition-all duration-700"
           onClick={()=>navigate("/signup")}
         />
         </div>
@@ -131,13 +131,13 @@ function userModal(){
           <div
 
             className="
-              relative mx-auto max-w-sm min-h-[420px] p-6 rounded-3xl
+              relative mx-auto max-w-sm min-h-105 p-6 rounded-3xl
               bg-[#0f1118]/60 backdrop-blur-lg
               border border-transparent
               before:absolute before:inset-0 before:rounded-3xl
-              before:bg-gradient-to-r before:from-purple-500/20 before:via-pink-500/20 before:to-blue-500/20 before:opacity-40
+              before:bg-linear-to-r before:from-purple-500/20 before:via-pink-500/20 before:to-blue-500/20 before:opacity-40
               after:absolute after:top-0 after:left-[-150%] after:w-[150%] after:h-full
-              after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent after:skew-x-12
+              after:bg-linear-to-r after:from-transparent after:via-white/20 after:to-transparent after:skew-x-12
               after:transition-all after:duration-700 hover:after:left-[150%]
               shadow-xl shadow-purple-900/30
               transition-transform duration-300 will-change-transform
@@ -160,14 +160,14 @@ function userModal(){
               </div>
 
               {/* Balance Section */}
-              <div className="rounded-2xl  p-4 bg-gradient-to-r from-[#171731] to-[#212158]">
+              <div className="rounded-2xl  p-4 bg-linear-to-r from-[#171731] to-[#212158]">
                 <p className="text-[#999] text-sm">Balance</p>
                 <p className="text-white text-3xl font-semibold">1.25 ETH</p>
                 <p className="text-[#636878] text-sm">0x3689...9845</p>
               </div>
 
               {/* Token Section */}
-              <div className="rounded-2xl p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30">
+              <div className="rounded-2xl p-4 bg-linear-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30">
                 <p className="text-[#999] text-sm">Raueuwt</p>
                 <p className="text-white text-2xl  font-semibold">3.80 ETH</p>
                 <p className="text-[#636878] text-sm">0x8I89...6945</p>
@@ -217,7 +217,7 @@ function userModal(){
      </div>
 
      {/* Footer */}
-  <footer className="bg-gradient-to-br from-[#2C2F48] to-[#1B1D2C] text-white py-10 px-8 min-h-[40svh] mt-4 md:mt-0">
+  <footer className="bg-linear-to-br from-[#2C2F48] to-[#1B1D2C] text-white py-10 px-8 min-h-[40svh] mt-4 md:mt-0">
   <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
     <div className="text-lg font-semibold">
       EthLink Presents

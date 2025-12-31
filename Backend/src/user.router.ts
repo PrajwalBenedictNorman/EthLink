@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Router,Request,Response} from "express";
 import z, { string } from 'zod'
-import generateKeyPair from "./eth_wallet";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authentication, Logging } from "./middleware /auth";
@@ -20,6 +19,8 @@ const userSignupSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password:z.string(),
     firstName:z.string(),
+    privateKey:z.string(),
+    pubKey:z.string(),
     lastName:string(),
     email:string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email out of order")
 })
@@ -46,12 +47,10 @@ function generateTokken(username:string,id:number,pubKey:string,firstName:string
 }
 
 userRouter.post("/signup",async (req:Request,res:Response):Promise<any>=>{
-
 const resp=userSignupSchema.safeParse(req.body)
 if(!resp.success) {return res.status(400).json({message:"No response"})}
 
-const {privateKey,pubKey}=await generateKeyPair()
-const {username,password,firstName,lastName,email}=resp.data
+const {username,password,firstName,lastName,email,pubKey,privateKey}=resp.data
 if (!privateKey || !pubKey) return res.json({message:"the key pair not generated"})
     const wallet_name=generateName();
     const hashedPassword =await bcrypt.hash(password,10)

@@ -21,8 +21,13 @@ function Signin() {
         const password=passwordRef.current?.value
         console.log(username,password)
         const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/signin`,{username,password})
-        if (!user) return alert("User not found") 
-        else{console.log(user); navigate("/Home"); sessionStorage.setItem("accessTokken",user.data.accessTokken)} 
+        if (!user?.data?.accessTokken) {
+        alert("User not found");
+        return;
+}
+
+sessionStorage.setItem("accessTokken", user.data.accessTokken);
+navigate("/Home");
     }
 
     async function dappSignin(){
