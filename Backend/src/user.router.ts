@@ -10,10 +10,10 @@ import { Transaction,hexlify,JsonRpcProvider } from "ethers";
 import generateName from "./wallet_name";
 
 
-
-
 export const userRouter=Router()
-const client=new PrismaClient()
+const client=new PrismaClient({
+  accelerateUrl: process.env.DATABASE_URL!,
+})
 const provider = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
 const userSignupSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
