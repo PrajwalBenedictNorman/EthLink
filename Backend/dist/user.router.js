@@ -46,7 +46,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
-const client_1 = require("@prisma/client");
 const express_1 = require("express");
 const zod_1 = __importStar(require("zod"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -56,8 +55,8 @@ const alchemy_sdk_1 = require("alchemy-sdk");
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const ethers_1 = require("ethers");
 const wallet_name_1 = __importDefault(require("./wallet_name"));
+const prisma_1 = require("./middleware /prisma");
 exports.userRouter = (0, express_1.Router)();
-const client = new client_1.PrismaClient();
 const provider = new ethers_1.JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
 const userSignupSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
@@ -94,7 +93,7 @@ exports.userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 
         return res.json({ message: "the key pair not generated" });
     const wallet_name = (0, wallet_name_1.default)();
     const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-    const user = yield client.user.create({ data: { username, password: hashedPassword, firstName, lastName, privateKey, pubKey, email, wallet_name } });
+    const user = yield prisma_1.client.user.create({ data: { username, password: hashedPassword, firstName, lastName, privateKey, pubKey, email, wallet_name } });
     if (!user)
         return res.status(400).json({ message: "User not created" });
     res.status(200).json({ message: "User Created" });
@@ -105,7 +104,7 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
         return res.status(400).json({ message: "No response" });
     }
     const { username, password } = resp.data;
-    const user = yield client.user.findFirst({
+    const user = yield prisma_1.client.user.findFirst({
         where: {
             username
         }
@@ -116,7 +115,7 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
     if (!verified)
         return res.json({ message: "Wrong password" });
     const { accessTokken, refreshTokken } = generateTokken(user.username, user.id, user.pubKey, user.firstName, user.lastName);
-    const updatedUser = yield client.user.update({
+    const updatedUser = yield prisma_1.client.user.update({
         where: {
             id: user.id
         },
@@ -133,7 +132,7 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
 exports.userRouter.post("/userDetails", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.id;
     try {
-        const user = yield client.user.findFirst({
+        const user = yield prisma_1.client.user.findFirst({
             where: {
                 id
             }, select: {
@@ -157,7 +156,7 @@ exports.userRouter.post("/signAndSendTransaction", auth_1.authentication, (req, 
     if (!receiverAddress || !amt) {
         return res.status(400).json({ message: "receiverAddress and amt are required" });
     }
-    const user = yield client.user.findFirst({
+    const user = yield prisma_1.client.user.findFirst({
         where: {
             id
         }
@@ -198,7 +197,7 @@ exports.userRouter.post("/signTransaction", auth_1.authentication, (req, res) =>
     if (!transaction) {
         return res.status(400).json({ message: "transaction are required" });
     }
-    const user = yield client.user.findFirst({
+    const user = yield prisma_1.client.user.findFirst({
         where: {
             id
         }
@@ -228,7 +227,7 @@ exports.userRouter.post("/signRawTransaction", auth_1.authentication, (req, res)
     if (!receiverAddress || !amt) {
         return res.status(400).json({ message: "receiverAddress and amt are required" });
     }
-    const user = yield client.user.findFirst({
+    const user = yield prisma_1.client.user.findFirst({
         where: {
             id
         }
@@ -267,7 +266,7 @@ exports.userRouter.post("/signAndSendDappTransaction", auth_1.authentication, (r
     var _a;
     const tx = req.body.transaction;
     const id = req.id;
-    const user = yield client.user.findFirst({
+    const user = yield prisma_1.client.user.findFirst({
         where: {
             id
         }

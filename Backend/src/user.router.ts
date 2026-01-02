@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client"
+import {PrismaPg} from "@prisma/adapter-pg"
 import { Router,Request,Response} from "express";
 import z, { string } from 'zod'
 import bcrypt from 'bcrypt'
@@ -8,14 +9,16 @@ import { Wallet,Utils,Alchemy,Network, TransactionRequest } from "alchemy-sdk";
 import CryptoJS from 'crypto-js'
 import { Transaction,hexlify,JsonRpcProvider } from "ethers";
 import generateName from "./wallet_name";
+import { client } from "./middleware /prisma";
+
+
 
 
 export const userRouter=Router()
-const client=new PrismaClient({
-  accelerateUrl: process.env.DATABASE_URL!,
-})
+
 const provider = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
 const userSignupSchema=z.object({
+
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
     password:z.string(),
     firstName:z.string(),
@@ -279,3 +282,6 @@ userRouter.post("/signAndSendDappTransaction", authentication, async (req:Loggin
     }
 
 });
+
+
+
