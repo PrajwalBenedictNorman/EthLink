@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 import {PrismaPg} from "@prisma/adapter-pg"
 import { Router,Request,Response} from "express";
-import z, { string } from 'zod'
+import z, { number, string } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authentication, Logging } from "./middleware /auth";
@@ -24,8 +24,8 @@ const userSignupSchema=z.object({
     firstName:z.string(),
     privateKey:z.string(),
     pubKey:z.string(),
-    lastName:string(),
-    email:string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email out of order")
+    lastName:z.string(),
+    email:z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,"Email out of order")
 })
 const userSigninSchema=z.object({
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
@@ -113,6 +113,143 @@ userRouter.post("/userDetails",authentication,async(req:Logging,res):Promise<any
     }
 })  
 
+userRouter.post("/txHistory",authentication,async(req:Logging,res):Promise<any>=>{
+    const userId=req.id
+    const network=req.body
+    const user=await client.user.findFirst({
+        where:{
+            id:userId
+        }
+    })
+    if(!user) return res.status(404).json({message:"User not found"})
+    
+    const apiKey = `${process.env.ALCHEMY_API_KEY}`;
+    let url
+    console.log(network)
+    if(network.network=="mainnet") { 
+        url=`${process.env.ALCHEMY_MAINNET_URL}`
+    }
+    else if(network.network=="sepolia"){ 
+        url=`${process.env.ALCHEMY_SEPOLIA_URL}`
+    }
+    else if(network.network=="holesky"){
+         url=`${process.env.ALCHEMY_HOLESKY_URL}`
+    }
+    console.log(url)
+    console.log(apiKey)
+    const baseURL = `${url}/${apiKey}`;
+    console.log(baseURL)
+    try {
+    const incomingData = {
+      jsonrpc: "2.0",
+      id: 0,
+      method: "alchemy_getAssetTransfers",
+      params: [{
+        fromBlock: "0x0",
+        toAddress:user.pubKey,
+        category: ["external","internal", "erc20", "erc721", "erc1155"],
+      }]
+    };
+
+    const outgoingData={
+        jsonrpc:"2.0",
+        id:0,
+        method:"alchemy_getAssetTransfers",
+        params:[{
+            fromBlock:"0x0",
+            fromAddress:user.pubKey,
+            category:["external","internal", "erc20", "erc721", "erc1155"],
+            
+        }]
+    }
+
+
+    const incomingResponse = await fetch(baseURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(incomingData)
+    });
+
+    const outgoingRespone=await fetch(baseURL,{
+        method:"POST",
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify(outgoingData)
+    })
+
+    const incomingResult = await incomingResponse.json();
+    const outgoingResult = await outgoingRespone.json();
+
+    let incomingTransfers = incomingResult.result?.transfers || [];
+    let outgoingTransfers = outgoingResult.result?.transfers || [];
+    incomingTransfers=incomingTransfers.map((p:any)=>({
+        ...p,
+        incoming:true
+
+    }))
+   outgoingTransfers =outgoingTransfers.map((p:any)=>({
+        ...p,
+        incoming:false
+
+    }))
+    const allTransfers = [
+  ...incomingTransfers,
+  ...outgoingTransfers
+];
+
+    allTransfers.sort((a, b) => {
+  return parseInt(b.blockNum, 16) - parseInt(a.blockNum, 16);
+});
+allTransfers.slice(0,5)
+    res.json(allTransfers)
+  } catch (error) {
+    console.error('Error:', error);
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
+userRouter.post(
+  "/seed",
+  authentication,
+  async (req: Logging, res): Promise<any> => {
+    try {
+      const userId = req.id;
+      const { encryptedSeed, iv, authTag, salt } = req.body;
+
+      if (!encryptedSeed || !iv || !authTag || !salt) {
+        return res.status(400).json({ message: "Missing seed fields" });
+      }
+
+      await client.seed.create({
+        // @ts-ignore
+        data: {
+            userId,
+          encryptedSeed,
+          iv,
+          authTag,
+          salt,
+        },
+      });
+
+      return res.status(200).json({ message: "Seed stored in DB" });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Failed to store seed" });
+    }
+  }
+);
 
 
 
@@ -131,7 +268,7 @@ userRouter.post("/userDetails",authentication,async(req:Logging,res):Promise<any
         })
         if(!user) return res.json({message:"User not found"})
             const config={
-        apiKey:"x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey:process.env.ALCHEMY_API_KEY || "",
         network:Network.ETH_SEPOLIA}
                 const alchemy=new Alchemy(config)
                 const decodedtext=CryptoJS.AES.decrypt(user.privateKey,process.env.CRYPTO_KEY as string)
@@ -176,10 +313,10 @@ userRouter.post("/userDetails",authentication,async(req:Logging,res):Promise<any
         })
         if(!user) return res.json({message:"User not found"})
             const config={
-        apiKey:"x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey:process.env.ALCHEMY_API_KEY || "",
         network:Network.ETH_SEPOLIA}
                 const alchemy=new Alchemy(config)
-                const decodedtext=CryptoJS.AES.decrypt(user.privateKey,"Secrect_key_to_Enter")
+                const decodedtext=CryptoJS.AES.decrypt(user.privateKey,process.env.CRYPTO_KEY as string)
                 const privateKey=decodedtext.toString(CryptoJS.enc.Utf8)
                 const wallet=new Wallet(privateKey)
 
@@ -209,10 +346,10 @@ userRouter.post("/signRawTransaction",authentication,async (req:Logging,res):Pro
         })
         if(!user) return res.json({message:"User not found"})
             const config={
-        apiKey:"x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey:process.env.ALCHEMY_API_KEY || "",
         network:Network.ETH_SEPOLIA}
                 const alchemy=new Alchemy(config)
-                const decodedtext=CryptoJS.AES.decrypt(user.privateKey,"Secrect_key_to_Enter")
+                const decodedtext=CryptoJS.AES.decrypt(user.privateKey,process.env.CRYPTO_KEY as string)
                 const privateKey=decodedtext.toString(CryptoJS.enc.Utf8)
                 const wallet=new Wallet(privateKey)
 
@@ -248,10 +385,10 @@ userRouter.post("/signAndSendDappTransaction", authentication, async (req:Loggin
     if(!user) return res.json({message:"No user found"})
 
     const config={
-        apiKey:"x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey:process.env.ALCHEMY_API_KEY || "",
         network:Network.ETH_SEPOLIA}
     const alchemy=new Alchemy(config)
-    const decodedtext=CryptoJS.AES.decrypt(user.privateKey,"Secrect_key_to_Enter")
+    const decodedtext=CryptoJS.AES.decrypt(user.privateKey,process.env.CRYPTO_KEY as string)
     const privateKey=decodedtext.toString(CryptoJS.enc.Utf8)
     const wallet=new Wallet(privateKey,alchemy)
 

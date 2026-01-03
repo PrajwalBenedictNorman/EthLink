@@ -1,37 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -47,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const express_1 = require("express");
-const zod_1 = __importStar(require("zod"));
+const zod_1 = __importDefault(require("zod"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const auth_1 = require("./middleware /auth");
@@ -64,8 +31,8 @@ const userSignupSchema = zod_1.default.object({
     firstName: zod_1.default.string(),
     privateKey: zod_1.default.string(),
     pubKey: zod_1.default.string(),
-    lastName: (0, zod_1.string)(),
-    email: (0, zod_1.string)().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email out of order")
+    lastName: zod_1.default.string(),
+    email: zod_1.default.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email out of order")
 });
 const userSigninSchema = zod_1.default.object({
     username: zod_1.default.string().regex(/^\S+$/, "Username cannot contain spaces"),
@@ -150,6 +117,112 @@ exports.userRouter.post("/userDetails", auth_1.authentication, (req, res) => __a
         console.log(error);
     }
 }));
+exports.userRouter.post("/txHistory", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    const userId = req.id;
+    const network = req.body;
+    const user = yield prisma_1.client.user.findFirst({
+        where: {
+            id: userId
+        }
+    });
+    if (!user)
+        return res.status(404).json({ message: "User not found" });
+    const apiKey = `${process.env.ALCHEMY_API_KEY}`;
+    let url;
+    console.log(network);
+    if (network.network == "mainnet") {
+        url = `${process.env.ALCHEMY_MAINNET_URL}`;
+    }
+    else if (network.network == "sepolia") {
+        url = `${process.env.ALCHEMY_SEPOLIA_URL}`;
+    }
+    else if (network.network == "holesky") {
+        url = `${process.env.ALCHEMY_HOLESKY_URL}`;
+    }
+    console.log(url);
+    console.log(apiKey);
+    const baseURL = `${url}/${apiKey}`;
+    console.log(baseURL);
+    try {
+        const incomingData = {
+            jsonrpc: "2.0",
+            id: 0,
+            method: "alchemy_getAssetTransfers",
+            params: [{
+                    fromBlock: "0x0",
+                    toAddress: user.pubKey,
+                    category: ["external", "internal", "erc20", "erc721", "erc1155"],
+                }]
+        };
+        const outgoingData = {
+            jsonrpc: "2.0",
+            id: 0,
+            method: "alchemy_getAssetTransfers",
+            params: [{
+                    fromBlock: "0x0",
+                    fromAddress: user.pubKey,
+                    category: ["external", "internal", "erc20", "erc721", "erc1155"],
+                }]
+        };
+        const incomingResponse = yield fetch(baseURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(incomingData)
+        });
+        const outgoingRespone = yield fetch(baseURL, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(outgoingData)
+        });
+        const incomingResult = yield incomingResponse.json();
+        const outgoingResult = yield outgoingRespone.json();
+        let incomingTransfers = ((_a = incomingResult.result) === null || _a === void 0 ? void 0 : _a.transfers) || [];
+        let outgoingTransfers = ((_b = outgoingResult.result) === null || _b === void 0 ? void 0 : _b.transfers) || [];
+        incomingTransfers = incomingTransfers.map((p) => (Object.assign(Object.assign({}, p), { incoming: true })));
+        outgoingTransfers = outgoingTransfers.map((p) => (Object.assign(Object.assign({}, p), { incoming: false })));
+        const allTransfers = [
+            ...incomingTransfers,
+            ...outgoingTransfers
+        ];
+        allTransfers.sort((a, b) => {
+            return parseInt(b.blockNum, 16) - parseInt(a.blockNum, 16);
+        });
+        allTransfers.slice(0, 5);
+        res.json(allTransfers);
+    }
+    catch (error) {
+        console.error('Error:', error);
+    }
+}));
+exports.userRouter.post("/seed", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.id;
+        const { encryptedSeed, iv, authTag, salt } = req.body;
+        if (!encryptedSeed || !iv || !authTag || !salt) {
+            return res.status(400).json({ message: "Missing seed fields" });
+        }
+        yield prisma_1.client.seed.create({
+            // @ts-ignore
+            data: {
+                userId,
+                encryptedSeed,
+                iv,
+                authTag,
+                salt,
+            },
+        });
+        return res.status(200).json({ message: "Seed stored in DB" });
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Failed to store seed" });
+    }
+}));
 exports.userRouter.post("/signAndSendTransaction", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.id;
     const { receiverAddress, amt } = req.body;
@@ -164,7 +237,7 @@ exports.userRouter.post("/signAndSendTransaction", auth_1.authentication, (req, 
     if (!user)
         return res.json({ message: "User not found" });
     const config = {
-        apiKey: "x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey: process.env.ALCHEMY_API_KEY || "",
         network: alchemy_sdk_1.Network.ETH_SEPOLIA
     };
     const alchemy = new alchemy_sdk_1.Alchemy(config);
@@ -205,11 +278,11 @@ exports.userRouter.post("/signTransaction", auth_1.authentication, (req, res) =>
     if (!user)
         return res.json({ message: "User not found" });
     const config = {
-        apiKey: "x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey: process.env.ALCHEMY_API_KEY || "",
         network: alchemy_sdk_1.Network.ETH_SEPOLIA
     };
     const alchemy = new alchemy_sdk_1.Alchemy(config);
-    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, "Secrect_key_to_Enter");
+    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, process.env.CRYPTO_KEY);
     const privateKey = decodedtext.toString(crypto_js_1.default.enc.Utf8);
     const wallet = new alchemy_sdk_1.Wallet(privateKey);
     try {
@@ -235,11 +308,11 @@ exports.userRouter.post("/signRawTransaction", auth_1.authentication, (req, res)
     if (!user)
         return res.json({ message: "User not found" });
     const config = {
-        apiKey: "x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey: process.env.ALCHEMY_API_KEY || "",
         network: alchemy_sdk_1.Network.ETH_SEPOLIA
     };
     const alchemy = new alchemy_sdk_1.Alchemy(config);
-    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, "Secrect_key_to_Enter");
+    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, process.env.CRYPTO_KEY);
     const privateKey = decodedtext.toString(crypto_js_1.default.enc.Utf8);
     const wallet = new alchemy_sdk_1.Wallet(privateKey);
     const transaction = {
@@ -274,11 +347,11 @@ exports.userRouter.post("/signAndSendDappTransaction", auth_1.authentication, (r
     if (!user)
         return res.json({ message: "No user found" });
     const config = {
-        apiKey: "x5I5ztoO52GtDKWL-lKBO37frG5AbCZf",
+        apiKey: process.env.ALCHEMY_API_KEY || "",
         network: alchemy_sdk_1.Network.ETH_SEPOLIA
     };
     const alchemy = new alchemy_sdk_1.Alchemy(config);
-    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, "Secrect_key_to_Enter");
+    const decodedtext = crypto_js_1.default.AES.decrypt(user.privateKey, process.env.CRYPTO_KEY);
     const privateKey = decodedtext.toString(crypto_js_1.default.enc.Utf8);
     const wallet = new alchemy_sdk_1.Wallet(privateKey, alchemy);
     const bytesArray = Object.values(tx);

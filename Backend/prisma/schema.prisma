@@ -28,7 +28,7 @@ model Seed{
   id Int @id @default(autoincrement())
   userId Int @unique  
   encryptedSeed String 
-  password String
+  authTag String
   salt String
   iv String
   backupReady Boolean @default(true)

@@ -53,7 +53,8 @@ const pubKey=decoded.pubKey
          if (!confirm('Do you want to sign this transaction?')) {
         throw new Error('User rejected signing');
     } 
-        const signedTx:Uint8Array=await axios.post("http://localhost:3000/user/signTransaction",{
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+        const signedTx:Uint8Array=await axios.post(`${backendUrl}/user/signTransaction`,{
             transaction
         },{headers:{Authorization:accessTokken}})
         return {signedTransaction: signedTx}
@@ -74,7 +75,8 @@ const pubKey=decoded.pubKey
         throw new Error('User rejected signing');
     } 
 
-    const response=await axios.post("http://localhost:3000/user/signAndSendDappTransaction",{
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const response=await axios.post(`${backendUrl}/user/signAndSendDappTransaction`,{
         transaction
     },{
         headers:{

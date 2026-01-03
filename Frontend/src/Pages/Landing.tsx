@@ -9,7 +9,7 @@ import { useRef } from "react";
 gsap.registerPlugin(ScrollTrigger)
 
 function Landing() {
-const navigate=useNavigate()
+  const navigate = useNavigate()
 
 useGSAP(()=>{
   gsap.to(".hero-title",{opacity:1,delay:1,y:-50,duration:1})
@@ -70,7 +70,7 @@ function userModal(){
   )
 }
   return (
-    <>
+    <div className="min-h-screen w-full">
       {/* NavBar */}
       <div className="flex items-center justify-between sm:px-12 px-4 py-4  ">
         <div className="flex items-center gap-24 ">
@@ -255,7 +255,7 @@ function userModal(){
   </div>
 </footer>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -26,5 +26,14 @@ react()],
       'util',
       'path-browserify',
     ],
+    exclude: ['argon2', 'argon2id'], // Exclude Node.js-only packages
+  },
+  server: {
+    proxy: {
+      '/user': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
 })

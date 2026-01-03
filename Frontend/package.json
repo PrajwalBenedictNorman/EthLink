@@ -20,6 +20,8 @@
     "@wallet-standard/react": "^1.0.1",
     "@wallet-standard/wallet": "^1.1.0",
     "alchemy-sdk": "^3.6.1",
+    "argon2": "^0.44.0",
+    "argon2id": "^1.0.1",
     "axios": "^1.10.0",
     "baseline-browser-mapping": "^2.9.11",
     "bip39": "^3.1.0",

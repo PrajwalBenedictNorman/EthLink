@@ -9,9 +9,14 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const user_router_1 = require("./user.router");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+// CORS configuration
+app.use((0, cors_1.default)({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+}));
 app.use(express_1.default.json());
 app.use("/user", user_router_1.userRouter);
-app.listen(process.env.PORT, () => {
-    console.log('Server is running');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

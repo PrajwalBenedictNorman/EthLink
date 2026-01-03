@@ -28,9 +28,9 @@ function AccountSettting() {
     async function getDetails(){
         try {
         const accessTokken=sessionStorage.getItem("accessTokken") as string
-        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/userDetails`,{},{
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/userDetails`,{},{
             headers:{
-                authorization:accessTokken
+                Authorization:accessTokken
             }
         })
         if(!user) return alert("user not found")

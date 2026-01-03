@@ -9,7 +9,8 @@ interface buttonProps {
   frontIcon?:ReactElement,
   backIcon?:ReactElement,
   className?:string,
-  onClick:()=>void
+  onClick:()=>void,
+  disabled?:boolean
 }
 
 const variantStyles: Record<Variant, string> = {
@@ -23,7 +24,18 @@ const variantStyles: Record<Variant, string> = {
 
 function Button(props:buttonProps) {
   return (
-    <button className={clsx(props.className,variantStyles[props.variant],'flex items-center gap-2 transition duration-1000 ')} onClick={props.onClick}>{props.frontIcon}{props.content}{props.backIcon}</button>
+    <button 
+      className={clsx(
+        props.className,
+        variantStyles[props.variant],
+        'flex items-center gap-2 transition duration-1000',
+        props.disabled && 'opacity-50 cursor-not-allowed'
+      )} 
+      onClick={props.onClick}
+      disabled={props.disabled}
+    >
+      {props.frontIcon}{props.content}{props.backIcon}
+    </button>
   )
 }
 

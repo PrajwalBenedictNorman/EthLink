@@ -4,10 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>EthLink - Crypto Wallet</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback content if React doesn't load -->
+      <div style="padding: 20px; color: white; background: #1a1a1a; min-height: 100vh;">
+        <h1>Loading...</h1>
+        <p>If you see this for more than a few seconds, check the browser console for errors.</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
