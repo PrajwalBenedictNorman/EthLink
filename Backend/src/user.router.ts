@@ -42,8 +42,9 @@ const userSigninSchema=z.object({
 // })
 
 
-function generateTokken(username:string,id:number,pubKey:string,firstName:string,lastName:string){
-    const accessTokken=jwt.sign({username,id,pubKey,firstName,lastName},process.env.ACCESS_TOKEN_PASSWORD as string)
+function generateTokken(username:string,id:number,pubKey:string,firstName:string,lastName:string,createdAt:Date){
+    console.log(createdAt)
+    const accessTokken=jwt.sign({username,id,pubKey,firstName,lastName,createdAt},process.env.ACCESS_TOKEN_PASSWORD as string)
     const refreshTokken=jwt.sign({username,id},process.env.REFRESH_TOKEN_PASSWORD as string)
     
     return {accessTokken,refreshTokken}
@@ -76,7 +77,8 @@ const user=await client.user.findFirst({
 if(!user || !user.password) return res.json({message:"No user found"})
     const verified=await bcrypt.compare(password,user.password)
     if(!verified) return res.json({message:"Wrong password"})
-        const {accessTokken,refreshTokken}=generateTokken(user.username,user.id,user.pubKey,user.firstName,user.lastName)
+        console.log(user.createdAt)
+        const {accessTokken,refreshTokken}=generateTokken(user.username,user.id,user.pubKey,user.firstName,user.lastName,user.createdAt)
     const updatedUser=await client.user.update({
         where:{
             id:user.id
@@ -211,8 +213,18 @@ allTransfers.slice(0,5)
 })
 
 
+//todo finish both routes
+userRouter.post("/getBalance",authentication,async (req:Logging,res)=>{
+    const userId=req.id
+    const network=req.body
 
 
+})
+
+userRouter.post("/getPrivateKey",authentication,async (req:Logging,res)=>{
+    const userId=req.id
+
+})
 
 
 

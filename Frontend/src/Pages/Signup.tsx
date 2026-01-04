@@ -81,7 +81,7 @@ function Signup() {
         console.log(acc.pubKey)
         console.log(acc.mnemonic)
         setMemonic(acc.mnemonic)
-        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signup`,{
+        const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/signup`,{
           firstName:firstName.trim(),
           lastName:lastName.trim(),
           username:username.trim(),

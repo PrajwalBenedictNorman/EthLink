@@ -5,26 +5,36 @@ import Button from '../Components/Button'
 import { jwtDecode } from 'jwt-decode'
 import Navbar from '../Components/Navbar'
 import NavSide from '../Components/NavSide'
-import { useRecoilValue } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { visibleAtom } from '../store/atom/visible'
+import { networkAtom } from '../store/atom/network'
+import Modal from '../Components/Modal'
 import axios from "axios"
 
-interface TokenPayload{
-    firstName:string,
-    lastName:string,
-    username:string,
-
-}
 
 function AccountSettting() {
     const [firstName,setFirstName]=useState("")
     const [lastName,setLastName]=useState("")
     const [email,setEmail]=useState("")
     const [walletName,setWalletName]=useState("")
+    const [pubKey,setPubKey]=useState("")
+    const [privateKey,setPrivateKey]=useState("")
     const [activeTab,setActiveTab]=useState("basic")
     const [acitveStauts,setActiveStatus]=useState("Disabled")
+    const [createdAt,setCreatedAt]=useState<Date>()
+    const [modalVisible,setModalVisible]=useState(false)
+    const [title,setTitle]=useState("")
+    const [password,setPassword]=useState("")
+    const [modalContent,setModalContent]=useState<React.ReactNode>(null)
     const visibile=useRecoilValue(visibleAtom)
+    const setNetwork=useSetRecoilState(networkAtom)
+    const network=useRecoilValue(networkAtom)
 
+
+    type jwtDecoded={
+        pubKey:string
+        createdAt:Date
+    }
     async function getDetails(){
         try {
         const accessTokken=sessionStorage.getItem("accessTokken") as string
@@ -41,7 +51,7 @@ function AccountSettting() {
         setWalletName(user.data.user.wallet_name)
         
         } catch (error) {
-            
+            throw error
         }
        
     }
@@ -49,11 +59,155 @@ function AccountSettting() {
         getDetails()
     })
 
+    useEffect(()=>{
+        const accessTokken=sessionStorage.getItem("accessTokken")
+        if(!accessTokken) return 
+        const decode=jwtDecode<jwtDecoded>(accessTokken)
+        const createdAtDate=new Date(decode.createdAt)
+        setPubKey(decode.pubKey)
+        setCreatedAt(createdAtDate)
+        console.log(createdAt)
+    },[])
+
     function sumit(){
 
     }
 
+
+    function networkChange(){
+       setModalVisible(true)
+       setTitle("Select the network")
+       setModalContent(
+        <>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+  
+  {/* Ethereum Mainnet */}
+  <button
+    onClick={()=>{
+        setNetwork("mainnet")
+        setModalVisible(false)
+    }}
+    className="group rounded-2xl bg-[#0b0f1a]/90 border border-white/10
+               p-6 h-36 flex flex-col items-center justify-center
+               hover:bg-[#0b0f1a]/50 hover:-translate-y-1
+               transition-all duration-300 ease-out"
+  >
+    <img src="Eth.png" alt="Ethereum" className="h-8 w-8 mb-3" />
+    <h1 className="text-sm font-medium text-white">
+      Ethereum Mainnet
+    </h1>
+    <span className="text-xs text-white/50 mt-1">
+      Live network
+    </span>
+  </button>
+
+  {/* Sepolia */}
+  <button
+    className="group rounded-2xl bg-[#0b0f1a]/90 border border-white/10
+               p-6 h-36 flex flex-col items-center justify-center
+               hover:bg-[#0b0f1a]/50 hover:-translate-y-1
+               transition-all duration-300 ease-out"
+    onClick={()=>{
+        setNetwork("sepolia")
+        setModalVisible(false)
+    }}
+  >
+    <img src="Eth.png" alt="Sepolia" className="h-8 w-8 mb-3 opacity-80" />
+    <h1 className="text-sm font-medium text-white">
+      Sepolia Testnet
+    </h1>
+    <span className="text-xs text-white/50 mt-1">
+      Test network
+    </span>
+  </button>
+
+  {/* Solana – Disabled */}
+  <div
+    className="rounded-2xl bg-[#0b0f1a]/40 border border-white/5
+               p-6 h-36 flex flex-col items-center justify-center
+               cursor-not-allowed"
+  >
+    <img src="solana.svg" alt="Solana" className="h-7 w-7 mb-3 opacity-40" />
+    <h1 className="text-sm font-medium text-white/40">
+      Solana
+    </h1>
+    <span className="text-xs text-white/30 mt-1">
+      Coming soon
+    </span>
+  </div>
+</div>
+        </>
+       )
+
+    }
     
+function privateKeyModal() {
+  setModalVisible(true)
+  setTitle("Private Key")
+
+  setModalContent(
+    <div className="flex flex-col gap-3 h-">
+      
+      {/* Warning */}
+      <div className="rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+        <p className="text-sm text-red-400">
+          Never share your private key with anyone. Anyone with access can steal your funds.
+        </p>
+      </div>
+
+      {/* Instruction */}
+      <h1 className="text-white/80 text-sm">
+        Enter your password to reveal your private key
+      </h1>
+
+      {/* Password Input */}
+      <div className="relative">
+        <input
+          type="password"
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter password"
+          className="
+            w-full h-12 rounded-lg
+            bg-[#0B0C19]
+            border border-white/10
+            px-4
+            text-white
+            placeholder:text-white/40
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-500/60
+          "
+        />
+      </div>
+
+      {/* Action Button */}
+      <button
+        className="
+          mt-2 h-12 rounded-lg
+          bg-blue-600 hover:bg-blue-700
+          transition
+          text-white font-medium
+        "
+        onClick={fetchPrivateKey}
+      >
+        Copy Private Key
+      </button>
+    </div>
+  )
+}
+
+async function fetchPrivateKey(){
+    const response=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/getPrivateKey`,{
+        password
+    },{
+        headers:{
+            Authorization:sessionStorage.getItem("accessTokken")
+        }
+    })
+    if(!response) return
+    setPrivateKey(response.data.privateKey)
+    
+}
+
   return (
     <>
         <NavSide />
@@ -176,8 +330,10 @@ function AccountSettting() {
                 <div className='bg-[#0B0C19] h-[30vh] md:w-[20vw] w-[90vw] rounded-xl border border-white/10 py-3 px-5' >
                     <h1 className='font-bold text-white'>Quick Actions</h1>
                     <div className='px-2 py-4 grid grid-cols-1 gap-4'>
-                        <Button variant='quaternary' content='Export Private Key' onClick={()=>{}} frontIcon={<Download className='h-4 w-4'/>} className='text-sm'/>
-                        <Button variant='quaternary' content='Network Settings' onClick={()=>{}} frontIcon={<Globe className='h-4 w-4'/>} className='text-sm'/>
+                        <Button variant='quaternary' content='Export Private Key' frontIcon={<Download className='h-4 w-4'/>} className='text-sm' onClick={privateKeyModal}/>
+                        <Modal isOpen={modalVisible} onClose={()=>{setModalVisible(false)}} title={title} children={modalContent}/>
+                        <Button variant='quaternary' content='Network Settings'  frontIcon={<Globe className='h-4 w-4'/>} className='text-sm' onClick={networkChange}/>
+                        <Modal isOpen={modalVisible} onClose={()=>{setModalVisible(false)}} title={title} children={modalContent}/>
                         <Button variant='quaternary' content='Contact Support' onClick={()=>{}} frontIcon={<User className='h-4 w-4'/>} className='text-sm'/>
                     </div>
                 </div>
@@ -186,15 +342,15 @@ function AccountSettting() {
                     <div className='px-4 py-5 grid grid-cols-1 gap-4'>
                         <div className='flex items-center justify-between'>
                             <p className='text-sm text-white/45'>Address</p>
-                            <p className='text-sm text-white/85'>0x742...7a9c</p>
+                            <p className='text-sm text-white/85'>{pubKey.slice(0,6)}...{pubKey.slice(-4)}</p>
                         </div>
                          <div className='flex items-center justify-between'>
                             <p className='text-sm text-white/45'>Network</p>
-                            <p className='text-sm text-white/85'>Ethereum Mainnet</p>
+                            <p className='text-sm text-white/85'>Ethereum {network}</p>
                         </div>
                          <div className='flex items-center justify-between'>
-                            <p className='text-sm text-white/45'>Created</p>
-                            <p className='text-sm text-white/85'>Oct 30,2025</p>
+                            <p className='text-sm text-white/45'>Created At</p>
+                            <p className='text-sm text-white/85 '>{createdAt?.toLocaleString()}</p>
                         </div>
                     </div>
                 </div>

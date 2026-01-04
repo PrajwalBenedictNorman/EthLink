@@ -8,6 +8,7 @@ import {QRCodeSVG} from 'qrcode.react'
 import NavSide from "../Components/NavSide";
 import { useRecoilValue } from "recoil";
 import { visibleAtom } from "../store/atom/visible";
+import { networkAtom } from "../store/atom/network";
 function Home() {
 
   type TokenPayload = {
@@ -37,12 +38,15 @@ type Tx = {
   const [gasPrice,setGasPrice]=useState(0)
   const[portfolioValue,setPortfolioValue]=useState(0)
   const [showHistory,setShowHistory]=useState(false)
-  const vsid=useRecoilValue(visibleAtom)
   const [sender,setSender]=useState<string[]>([])
   const [receiver,setReceiver]=useState<string[]>([])
   const [hash,setHash]=useState<string[]>([])
   const [amount,setAmount]=useState<number[]>([])
   const [incoming,setIncoming]=useState<boolean[]>([])
+  const vsid=useRecoilValue(visibleAtom)
+  const network=useRecoilValue(networkAtom)
+  
+  
   useEffect(()=>{const accessTokken=sessionStorage.getItem("accessTokken")
     console.log(accessTokken)
     try {
@@ -104,9 +108,9 @@ async function sendTansaction(){
   {
     const response=await axios.post(`https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,{
       "jsonrpc": "2.0",
-  "method": "eth_getTransactionByHash",
-  "params": [txhash],
-  "id": 1
+      "method": "eth_getTransactionByHash",
+      "params": [txhash],
+      "id": 1
     })  
     // if(!response || !response.data.blockNumber) return
     if(!response) return;
@@ -139,11 +143,11 @@ async function sendTansaction(){
 
 
   async function txHistory(){
-    const transaction=await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/txHistory`,{network:"sepolia"},{headers:{
+    const transaction=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/txHistory`,{network:network},{headers:{
       authorization:sessionStorage.getItem("accessTokken")
       }})
       console.log(transaction)
-      if (transaction?.data) {
+      if (transaction?.data.length>0) {
         const txs = transaction.data; 
         setSender(txs.map((tx:Tx) => tx.from));
         setReceiver(txs.map((tx:Tx) => tx.to));
@@ -160,7 +164,6 @@ async function sendTansaction(){
   useEffect(()=>{
     setInterval(()=>{
       txHistory()
-      portfolio()
     },30000)
   },[])
 
@@ -273,7 +276,7 @@ function copyText(){
             <p className="text-white">Network Status</p>
           </div>
           <p className="text-green-500 font-bold text-2xl py-2">Active</p>
-          <p className="text-white/45">Ethereum Mainnet</p>
+          <p className="text-white/45">Ethereum {network}</p>
         </div>
       </div>
 

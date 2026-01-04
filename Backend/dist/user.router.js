@@ -45,8 +45,9 @@ const userSigninSchema = zod_1.default.object({
 //                 params.args.data.password=await bcrypt.hash(params.args.data.password,10)
 //     return next(params)
 // })
-function generateTokken(username, id, pubKey, firstName, lastName) {
-    const accessTokken = jsonwebtoken_1.default.sign({ username, id, pubKey, firstName, lastName }, process.env.ACCESS_TOKEN_PASSWORD);
+function generateTokken(username, id, pubKey, firstName, lastName, createdAt) {
+    console.log(createdAt);
+    const accessTokken = jsonwebtoken_1.default.sign({ username, id, pubKey, firstName, lastName, createdAt }, process.env.ACCESS_TOKEN_PASSWORD);
     const refreshTokken = jsonwebtoken_1.default.sign({ username, id }, process.env.REFRESH_TOKEN_PASSWORD);
     return { accessTokken, refreshTokken };
 }
@@ -81,7 +82,8 @@ exports.userRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 
     const verified = yield bcrypt_1.default.compare(password, user.password);
     if (!verified)
         return res.json({ message: "Wrong password" });
-    const { accessTokken, refreshTokken } = generateTokken(user.username, user.id, user.pubKey, user.firstName, user.lastName);
+    console.log(user.createdAt);
+    const { accessTokken, refreshTokken } = generateTokken(user.username, user.id, user.pubKey, user.firstName, user.lastName, user.createdAt);
     const updatedUser = yield prisma_1.client.user.update({
         where: {
             id: user.id
@@ -198,6 +200,10 @@ exports.userRouter.post("/txHistory", auth_1.authentication, (req, res) => __awa
     catch (error) {
         console.error('Error:', error);
     }
+}));
+exports.userRouter.post("/getBalance", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.id;
+    const network = req.body;
 }));
 exports.userRouter.post("/seed", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
