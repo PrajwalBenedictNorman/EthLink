@@ -25,12 +25,11 @@ function AccountSettting() {
     const [modalVisible,setModalVisible]=useState(false)
     const [title,setTitle]=useState("")
     const [password,setPassword]=useState("")
+    const [newPassword,setNewPassword]=useState("")
     const [modalContent,setModalContent]=useState<React.ReactNode>(null)
     const visibile=useRecoilValue(visibleAtom)
     const setNetwork=useSetRecoilState(networkAtom)
     const network=useRecoilValue(networkAtom)
-
-
     type jwtDecoded={
         pubKey:string
         createdAt:Date
@@ -205,8 +204,231 @@ async function fetchPrivateKey(){
     })
     if(!response) return
     setPrivateKey(response.data.privateKey)
-    
+     navigator.clipboard.writeText(privateKey)
 }
+
+
+function supportModal(){
+  setModalVisible(true)
+  setTitle("Create a New Support ticket")
+  setModalContent(
+    <>
+  <div className="flex flex-col gap-6">
+
+    {/* Intro */}
+
+    <p className="text-white/55 text-sm">
+      Fill in the details below to raise a new support ticket.
+    </p>
+
+    <div className="grid grid-cols-1 gap-5">
+
+      <div className="flex flex-col gap-1 items-start">
+        <label className="text-white/75 text-sm">
+          Subject
+        </label>
+
+        <input
+          type="text"
+          placeholder="Enter a short title for your issue"
+          className="w-full h-10 rounded-md bg-white/90 px-3 text-sm text-black placeholder:text-black/40 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500/60"/>
+      </div>
+
+      {/* Description */}
+      <div className="flex flex-col gap-1 items-start">
+        <label className="text-white/75 text-sm">
+          Description
+        </label>
+
+        <textarea
+          placeholder="Describe your issue in detail..."
+          className="
+            w-full min-h-[160px] rounded-md
+            bg-white/90
+            px-3 py-2
+            text-sm text-black
+            placeholder:text-black/40
+            border border-white/20
+            resize-none
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-500/60
+          "
+        />
+      </div>
+
+    </div>
+  </div>
+</>
+
+  )
+}
+
+async function deleteModal(){
+  setTitle("Delete Wallet")
+  setModalVisible(true)
+  setModalContent(
+    <>
+    <div className="flex flex-col gap-5">
+
+  <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4">
+    <p className="text-sm text-red-400 font-medium">
+      This action is permanent and cannot be undone.
+    </p>
+    <p className="text-xs text-red-400/80 mt-1">
+      All wallet data, keys, and access will be permanently deleted.
+    </p>
+  </div>
+
+  <div className="flex flex-col gap-2">
+    <label className="text-white/70 text-sm">
+      Type <span className="font-semibold text-red-400">DELETE WALLET</span> to confirm
+    </label>
+
+    <input
+      type="text"
+      placeholder="DELETE WALLET"
+      className="
+        h-11 rounded-md
+        bg-[#0B0C19]
+        px-3
+        text-white
+        placeholder:text-white/30
+        border border-red-500/30
+        focus:outline-none
+        focus:ring-2 focus:ring-red-500/60
+      "
+    />
+  </div>
+
+  <button
+    className="
+      mt-2 h-11 rounded-md
+      bg-red-600/90 hover:bg-red-700
+      text-white font-medium
+      transition
+      disabled:opacity-40 disabled:cursor-not-allowed
+    "
+  >
+    Delete Wallet
+  </button>
+
+</div>
+
+    </>
+  )
+}
+
+function passwordModal(){
+  setModalVisible(true)
+  setTitle("Change Password")
+  setModalContent(
+   <>
+  <div className="flex flex-col gap-6">
+
+    <div className="flex flex-col gap-1">
+      <p className="text-sm text-white/60">
+        Protect your account with a strong, secure password.
+      </p>
+      <p className="text-sm text-white/40">
+        Make sure it’s hard to guess and easy for you to remember.
+      </p>
+    </div>
+
+    <div className="grid grid-cols-1 gap-5">
+
+      <div className="flex flex-col gap-1 items-start">
+        <label className="text-white/75 text-sm">
+          Current password
+        </label>
+        <input
+          type="password"
+          onChange={(e)=>{
+            setPassword(e.target.value)
+          }}  
+          className="
+            h-11 rounded-md
+            bg-[#0B0C19]
+            w-full
+            px-3
+            text-white
+            border border-white/15
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-500/60
+          "
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 items-start">
+        <label className="text-white/75 text-sm">
+          New password
+        </label>
+        <input
+          type="password"
+          placeholder="At least 6 characters"
+          className="
+            h-11 rounded-md
+            bg-[#0B0C19]
+            px-3
+            w-full
+            text-white
+            placeholder:text-white/30
+            border border-white/15
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-500/60
+          "
+        />
+      </div>
+
+      <div className="flex flex-col gap-1 items-start">
+        <label className="text-white/75 text-sm">
+          Confirm new password
+        </label>
+        <input
+          type="password"
+          className="
+            h-11 rounded-md
+            bg-[#0B0C19]
+            px-3
+            w-full
+            text-white
+            border border-white/15
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-500/60
+          "
+        />
+      </div>
+
+    </div>
+
+    <button
+      onClick={changePass}
+      className="
+        mt-2 h-11 rounded-md
+        bg-blue-600 hover:bg-blue-700
+        transition
+        text-white font-medium
+        disabled:opacity-40 disabled:cursor-not-allowed
+      "
+    >
+      Change password
+    </button>
+
+  </div>
+</>
+
+  )
+}
+
+async function changePass(){
+  const response=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/passwordChange`,{
+
+  })
+}
+
+
+
+
+
 
   return (
     <>
@@ -275,7 +497,7 @@ async function fetchPrivateKey(){
                         <p className='text-white/45 text-sm'>Update your account password</p>
                     </div>
                 </div>
-                <Button content='Change' variant='quaternary' onClick={()=>{}} className='text-xs'/>
+                <Button content='Change' variant='quaternary' onClick={passwordModal} className='text-xs'/>
                 </div>
 
                 </div>
@@ -331,10 +553,9 @@ async function fetchPrivateKey(){
                     <h1 className='font-bold text-white'>Quick Actions</h1>
                     <div className='px-2 py-4 grid grid-cols-1 gap-4'>
                         <Button variant='quaternary' content='Export Private Key' frontIcon={<Download className='h-4 w-4'/>} className='text-sm' onClick={privateKeyModal}/>
-                        <Modal isOpen={modalVisible} onClose={()=>{setModalVisible(false)}} title={title} children={modalContent}/>
                         <Button variant='quaternary' content='Network Settings'  frontIcon={<Globe className='h-4 w-4'/>} className='text-sm' onClick={networkChange}/>
+                        <Button variant='quaternary' content='Contact Support' onClick={supportModal} frontIcon={<User className='h-4 w-4'/>} className='text-sm'/>
                         <Modal isOpen={modalVisible} onClose={()=>{setModalVisible(false)}} title={title} children={modalContent}/>
-                        <Button variant='quaternary' content='Contact Support' onClick={()=>{}} frontIcon={<User className='h-4 w-4'/>} className='text-sm'/>
                     </div>
                 </div>
                 <div className='bg-[#0B0C19] h-[25vh] md:w-[20vw] w-[90vw] rounded-xl  border border-white/10 py-3 px-5' >
@@ -356,7 +577,7 @@ async function fetchPrivateKey(){
                 </div>
                 <div className='bg-[#0B0C19] h-[20vh] md:w-[20vw] w-[90vw] rounded-xl border border-red-500  py-3 px-5' >
                     <h1 className='text-red-500 font-bold'>Danger Zone</h1>
-                    <button className='text-red-400 w-full border border-red-400 rounded-xl py-2 mt-3'><span className='flex items-center justify-start'><Trash2 className='h-4 w-4 text-red-400 me-2 ms-4'/>Delete Wallet</span></button>
+                    <button className='text-red-400 w-full border border-red-400 rounded-xl py-2 mt-3' onClick={deleteModal}><span className='flex items-center justify-start'><Trash2 className='h-4 w-4 text-red-400 me-2 ms-4'/>Delete Wallet</span></button>
                     <p className='text-white/45 text-xs py-2'>This action cannot be undone. Make sure you have backed up your seed phrase.</p>
                 </div>
             </div>

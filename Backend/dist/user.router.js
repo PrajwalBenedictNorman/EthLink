@@ -201,9 +201,26 @@ exports.userRouter.post("/txHistory", auth_1.authentication, (req, res) => __awa
         console.error('Error:', error);
     }
 }));
+//todo finish both routes
 exports.userRouter.post("/getBalance", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.id;
     const network = req.body;
+}));
+exports.userRouter.post("/getPrivateKey", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.id;
+    const password = req.body;
+    const user = yield prisma_1.client.user.findFirst({
+        where: {
+            id: userId
+        }
+    });
+    console.log(password);
+    if (!user)
+        return res.status(404).json({ message: "User not found" });
+    const verified = bcrypt_1.default.compare(password.password, user.password);
+    if (!verified)
+        return res.status(300).json({ message: "Password not correct" });
+    res.status(200).json(user.privateKey);
 }));
 exports.userRouter.post("/seed", auth_1.authentication, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -223,6 +223,17 @@ userRouter.post("/getBalance",authentication,async (req:Logging,res)=>{
 
 userRouter.post("/getPrivateKey",authentication,async (req:Logging,res)=>{
     const userId=req.id
+    const password=req.body 
+    const user=await client.user.findFirst({
+        where:{
+            id:userId
+        }
+    })
+    console.log(password)
+    if (!user) return res.status(404).json({message:"User not found"})
+    const verified= bcrypt.compare(password.password,user.password)
+    if(!verified) return res.status(300).json({message:"Password not correct"})
+    res.status(200).json(user.privateKey)
 
 })
 

@@ -23,15 +23,16 @@ export default function Modal({ isOpen, onClose, title, children }:ModalProps) {
           isOpen ? "scale-100 opacity-100" : "scale-90 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="w-full max-w-md h-[40vh] rounded-2xl bg-[#14162E] p-6 text-white/80 shadow-2xl text-center">
+        <div className="w-full max-w-md rounded-2xl bg-[#14162E] p-6 text-white/80 shadow-2xl text-center">
           {title && <h2 className="mb-4 text-2xl font-semibold">{title}</h2>}
           <div className="mb-10 text-black/55">{children}</div>
-          <button
+            <button
             onClick={onClose}
-            className="rounded-lg bg-white px-4 py-2 text-blue-900 hover:bg-gray-200 transition"
+            className="rounded-lg bg-white px-4 py-2 text-blue-900 hover:bg-gray-200 transition "
           >
             Close
           </button>
+          
         </div>
       </div>
     </>
