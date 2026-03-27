@@ -9,6 +9,7 @@ import NavSide from "../Components/NavSide";
 import { useRecoilValue } from "recoil";
 import { visibleAtom } from "../store/atom/visible";
 import { networkAtom } from "../store/atom/network";
+import SeedModal from "../Components/SeedModal"
 function Home() {
 
   type TokenPayload = {
@@ -38,11 +39,13 @@ type Tx = {
   const [gasPrice,setGasPrice]=useState(0)
   const[portfolioValue,setPortfolioValue]=useState(0)
   const [showHistory,setShowHistory]=useState(false)
+  const [showPortfolio,setShowPortfolio]=useState(false)
   const [sender,setSender]=useState<string[]>([])
   const [receiver,setReceiver]=useState<string[]>([])
   const [hash,setHash]=useState<string[]>([])
   const [amount,setAmount]=useState<number[]>([])
   const [incoming,setIncoming]=useState<boolean[]>([])
+
   const vsid=useRecoilValue(visibleAtom)
   const network=useRecoilValue(networkAtom)
   
@@ -62,21 +65,17 @@ type Tx = {
   
  useEffect(()=>{
   if (!ethAddress || typeof ethAddress !== 'string') return;
- setInterval(()=>{ async function getBalance(){
-    const resp=await axios.post(`https://eth-sepolia.g.alchemy.com/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`,{
-        "jsonrpc": "2.0",
-  "method": "eth_getBalance",
-  "params": [
-    ethAddress,
-    "latest"
-  ],
-  "id": 1
-    })
-    if(!resp) return;
-    console.log(resp)
-   const eth=parseInt(resp.data.result, 16) / Math.pow(10, 18)
-    setBalance(eth)
-  }
+ setInterval(()=>{
+   async function getBalance() {
+    const token = sessionStorage.getItem("accessTokken")
+    const resp = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/user/getBalance`,
+        { network: "sepolia" },
+        { headers: { Authorization: token } }
+    )
+    if (!resp?.data?.balance) return
+    setBalance(resp.data.balance)
+}
   getBalance()},20000)
  
  },[ethAddress])
@@ -144,7 +143,7 @@ async function sendTansaction(){
 
   async function txHistory(){
     const transaction=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/txHistory`,{network:network},{headers:{
-      authorization:sessionStorage.getItem("accessTokken")
+      Authorization:sessionStorage.getItem("accessTokken")
       }})
       console.log(transaction)
       if (transaction?.data.length>0) {
@@ -195,6 +194,28 @@ async function portfolio(){
 function copyText(){
 
 }
+
+useEffect(()=>{
+  if(network=='mainnet') {
+setShowPortfolio(true)
+}
+},[network])
+
+useEffect(() => {
+    if (!ethAddress) return
+    const token = sessionStorage.getItem("accessTokken")
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/seed/status`, {}, {
+        headers: { Authorization: token }
+    }).then(res => {
+        if (res.data.exists && !res.data.viewed) {
+            // Show seed modal on first login
+            setTitle("Back up your seed phrase")
+            setModalContent(<SeedModal />)  
+            setVisible(true)
+        }
+    })
+}, [ethAddress])
+
   return(
  <>
   <div className="bg-[#0B0C19]/65 min-h-screen w-full overflow-x-hidden">
@@ -249,8 +270,19 @@ function copyText(){
             />
             <p className="text-white">Portfolio Value</p>
           </div>
-          <p className="text-white font-bold text-2xl py-2">${portfolioValue.toFixed(2)}</p>
-          <p className="text-white/45">+0.00% (24h)</p>
+          {showPortfolio && <><p className="text-white font-bold text-2xl py-2">${portfolioValue.toFixed(2)}</p>
+          <p className="text-white/45">+0.00% (24h)</p></>}
+          {!showPortfolio && (
+  <>
+    <p className="text-white/90 text-xl font-semibold mt-2">
+      Portfolio not displayed
+    </p>
+    <p className="text-[#7DD3FC] text-sm font-medium mt-2">
+      Choose a live network to view your portfolio
+    </p>
+  </>
+)}
+
         </div>
 
         {/* Total Transactions */}

@@ -1,22 +1,34 @@
-import { PrismaClient } from "@prisma/client"
-import {PrismaPg} from "@prisma/adapter-pg"
 import { Router,Request,Response} from "express";
 import z, { number, string } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { authentication, Logging } from "./middleware /auth";
-import { Wallet,Utils,Alchemy,Network, TransactionRequest } from "alchemy-sdk";
+import { authentication, Logging } from "./middleware/auth";
+import { Alchemy, Network } from "alchemy-sdk";
+import { Wallet, formatEther, parseEther, parseUnits } from "ethers";
+import { TransactionRequest } from "@ethersproject/abstract-provider";
 import CryptoJS from 'crypto-js'
 import { Transaction,hexlify,JsonRpcProvider } from "ethers";
 import generateName from "./wallet_name";
-import { client } from "./middleware /prisma";
-
+import { client } from "./middleware/prisma";
+import rateLimit from "express-rate-limit"
+import helmet from "helmet"
 
 
 
 export const userRouter=Router()
 
 const provider = new JsonRpcProvider(`https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`);
+const seedLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5,
+    message: { message: "Too many attempts, please try again later" }
+})
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: "Too many login attempts" }
+})
 const userSignupSchema=z.object({
 
     username:z.string().regex(/^\S+$/, "Username cannot contain spaces"),
@@ -42,12 +54,18 @@ const userSigninSchema=z.object({
 // })
 
 
-function generateTokken(username:string,id:number,pubKey:string,firstName:string,lastName:string,createdAt:Date){
-    console.log(createdAt)
-    const accessTokken=jwt.sign({username,id,pubKey,firstName,lastName,createdAt},process.env.ACCESS_TOKEN_PASSWORD as string)
-    const refreshTokken=jwt.sign({username,id},process.env.REFRESH_TOKEN_PASSWORD as string)
-    
-    return {accessTokken,refreshTokken}
+function generateTokken(username: string, id: number, pubKey: string, firstName: string, lastName: string, createdAt: Date) {
+    const accessTokken = jwt.sign(
+        { username, id, pubKey, firstName, lastName, createdAt },
+        process.env.ACCESS_TOKEN_PASSWORD as string,
+        { expiresIn: "15m" }   
+    )
+    const refreshTokken = jwt.sign(
+        { username, id },
+        process.env.REFRESH_TOKEN_PASSWORD as string,
+        { expiresIn: "7d" }    
+    )
+    return { accessTokken, refreshTokken }
 }
 
 userRouter.post("/signup",async (req:Request,res:Response):Promise<any>=>{
@@ -58,13 +76,14 @@ const {username,password,firstName,lastName,email,pubKey,privateKey}=resp.data
 if (!privateKey || !pubKey) return res.json({message:"the key pair not generated"})
     const wallet_name=generateName();
     const hashedPassword =await bcrypt.hash(password,10)
-    const user=await client.user.create({data:{username,password:hashedPassword,firstName,lastName,privateKey,pubKey,email,wallet_name}})
+    const encryptedPrivateKey = CryptoJS.AES.encrypt(privateKey, process.env.CRYPTO_KEY as string).toString()
+    const user=await client.user.create({data:{username,password:hashedPassword,firstName,lastName,privateKey:encryptedPrivateKey,pubKey,email,wallet_name}})
     if(!user) return res.status(400).json({message:"User not created"})
      res.status(200).json({message:"User Created"})
 })
 
 
-userRouter.post("/signin",async (req,res):Promise<any>=>{
+userRouter.post("/signin",authLimiter,async (req,res):Promise<any>=>{
     const resp=userSigninSchema.safeParse(req.body)
 if(!resp.success) {return res.status(400).json({message:"No response"})}
 const {username,password}=resp.data
@@ -79,12 +98,13 @@ if(!user || !user.password) return res.json({message:"No user found"})
     if(!verified) return res.json({message:"Wrong password"})
         console.log(user.createdAt)
         const {accessTokken,refreshTokken}=generateTokken(user.username,user.id,user.pubKey,user.firstName,user.lastName,user.createdAt)
-    const updatedUser=await client.user.update({
+        const hashedRefreshToken = await bcrypt.hash(refreshTokken, 10)
+        const updatedUser=await client.user.update({
         where:{
             id:user.id
         },
         data:{
-            refreshTokken
+            refreshTokken:hashedRefreshToken
         }
         //todo remove accessToken from schema 
     })
@@ -221,24 +241,59 @@ userRouter.post("/getBalance",authentication,async (req:Logging,res)=>{
 
 })
 
-userRouter.post("/getPrivateKey",authentication,async (req:Logging,res)=>{
-    const userId=req.id
-    const password=req.body 
-    const user=await client.user.findFirst({
-        where:{
-            id:userId
-        }
-    })
-    console.log(password)
-    if (!user) return res.status(404).json({message:"User not found"})
-    const verified= bcrypt.compare(password.password,user.password)
-    if(!verified) return res.status(300).json({message:"Password not correct"})
-    res.status(200).json(user.privateKey)
+userRouter.post("/gasPrice",async(req,res)=>{
+    const baseUrl=`${process.env.ALCHEMY_MAINNET_URL}/${process.env.ALCHEMY_API_KEY}`
+    const options = {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+    "jsonrpc": "2.0",
+    "method": "eth_gasPrice",
+    "params": [],
+    "id": 1
+  }),};
+try {
+  const response = await fetch(baseUrl, options);
+  const data = await response.json();
+    res.send(data)
+} catch (error) {
+    throw error
+}
 
 })
 
+// ADD this new route after /seed POST
+userRouter.post("/seed/view", seedLimiter, authentication, async (req: Logging, res): Promise<any> => {
+    try {
+        const userId = req.id
+        const seed = await client.seed.findFirst({ where: { userId } })
+        if (!seed) return res.status(404).json({ message: "No seed found" })
 
+        // Mark first view timestamp
+        if (!seed.viewed) {
+            await client.seed.update({
+                where: { userId },
+                // @ts-ignore
+                data: { viewed: true, updatedAt: new Date() }
+            })
+        } else {
+            // Second view — hard delete after returning
+            const seedData = { ...seed }
+            await client.seed.delete({ where: { userId } })
+            return res.status(200).json({ seed: seedData, deleted: true })
+        }
 
+        return res.status(200).json({ seed, deleted: false })
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({ message: "Failed to retrieve seed" })
+    }
+})
+
+// Endpoint to check seed status (does it still exist, has it been viewed)
+userRouter.post("/seed/status", authentication, async (req: Logging, res): Promise<any> => {
+    const userId = req.id
+    const seed = await client.seed.findFirst({ where: { userId } })
+    if (!seed) return res.status(200).json({ exists: false })
+    return res.status(200).json({ exists: true, viewed: seed.viewed })
+})
 
 
 
@@ -300,10 +355,10 @@ userRouter.post(
 
         const transaction={
             to:receiverAddress,
-            value:Utils.parseEther(amt),
+            value:parseEther(amt),
             gasLimit: "21000",
-            maxPriorityFeePerGas: Utils.parseUnits("5", "gwei"),
-            maxFeePerGas: Utils.parseUnits("20", "gwei"),
+            maxPriorityFeePerGas: parseUnits("5", "gwei"),
+            maxFeePerGas: parseUnits("20", "gwei"),
             nonce: await alchemy.core.getTransactionCount(wallet.getAddress()),
             type: 2,
             chainId:11155111,
@@ -378,10 +433,10 @@ userRouter.post("/signRawTransaction",authentication,async (req:Logging,res):Pro
 
         const transaction={
             to:receiverAddress,
-            value:Utils.parseEther(amt),
+            value:parseEther(amt),
             gasLimit: "21000",
-            maxPriorityFeePerGas: Utils.parseUnits("5", "gwei"),
-            maxFeePerGas: Utils.parseUnits("20", "gwei"),
+            maxPriorityFeePerGas: parseUnits("5", "gwei"),
+            maxFeePerGas: parseUnits("20", "gwei"),
             nonce: await alchemy.core.getTransactionCount(wallet.getAddress()),
             type: 2,
             chainId:11155111,
@@ -426,8 +481,8 @@ userRouter.post("/signAndSendDappTransaction", authentication, async (req:Loggin
             to:parsed.to ?? undefined,
             value:parsed.value,
             gasLimit: "21000",
-            maxPriorityFeePerGas: Utils.parseUnits("5", "gwei"),
-            maxFeePerGas: Utils.parseUnits("20", "gwei"),
+            maxPriorityFeePerGas: parseUnits("5", "gwei"),
+            maxFeePerGas: parseUnits("20", "gwei"),
             nonce: await alchemy.core.getTransactionCount(wallet.getAddress()),
             type: 2,
             chainId:11155111,
@@ -443,5 +498,15 @@ userRouter.post("/signAndSendDappTransaction", authentication, async (req:Loggin
 
 });
 
+userRouter.post("/getPrivateKey", authentication, async (req: Logging, res): Promise<any> => {
+    const userId = req.id
+    const { password } = req.body
+    const user = await client.user.findFirst({ where: { id: userId } })
+    if (!user) return res.status(404).json({ message: "User not found" })
+    const verified = await bcrypt.compare(password, user.password)  // ADD await
+    if (!verified) return res.status(401).json({ message: "Password not correct" })
+    // Private key is already encrypted in DB — return it encrypted, let frontend decrypt
+    return res.status(200).json({ encryptedPrivateKey: user.privateKey })
+})
 
 

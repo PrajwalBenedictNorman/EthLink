@@ -3,6 +3,16 @@ import type {StandardConnectFeature, Wallet} from "@wallet-standard/core"
 import { jwtDecode } from "jwt-decode"
 import axios from "axios";
 
+function getValidToken(): string {
+    const token = sessionStorage.getItem("accessTokken")
+    if (!token) throw new Error("No access token")
+    const decoded = jwtDecode<{ exp: number }>(token)
+    if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+        sessionStorage.removeItem("accessTokken")
+        throw new Error("Token expired, please sign in again")
+    }
+    return token
+}
 
 
 export class EthereumWallet implements Wallet{
@@ -13,10 +23,7 @@ export class EthereumWallet implements Wallet{
     readonly accounts: WalletAccount[]=[];
     
     _connect: StandardConnectFeature['standard:connect']['connect']=async ()=>{
-        const accessTokken=sessionStorage.getItem("accessTokken") as string
-        if (!accessTokken || typeof accessTokken !== "string") {
-        throw new Error("No valid access token found in sessionStorage.");
-        }
+        const accessTokken=getValidToken()
         const decoded=jwtDecode<{pubKey:string}>(accessTokken)
         const pubKey=decoded.pubKey
         this.accounts.length=0;
@@ -59,7 +66,7 @@ const pubKey=decoded.pubKey
         },{headers:{Authorization:accessTokken}})
         return {signedTransaction: signedTx}
     }
-
+    
     #signAndSendTransaction:SignAndSendTransactionMethod=async (input)=>{
            const {account,transaction,chain}=input
         if (chain && !this.chains.includes('eip155:11155111')) {

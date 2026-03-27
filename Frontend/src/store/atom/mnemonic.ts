@@ -2,10 +2,10 @@ import {atom} from "recoil"
 
 export const mnemonicAtom=atom({
     default:"",
-    key:"mnemonic"
+    key:"mnemonicAtom"
 })
 
 export const encryptedMemonicAtom=atom({
     default:"",
-    key:"encryptedMemonic"
+    key:"encryptedMemonicAtom"
 })

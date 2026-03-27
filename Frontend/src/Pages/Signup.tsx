@@ -12,8 +12,7 @@ function Signup() {
   const [lastName,setLastName]=useState("")
   const [username,setUsername]=useState("")
   const [email,setEmail]=useState("")
-  const [pubkey,setPubkey]=useState("")
-  const [privatekey,setPrivatekey]=useState("")
+  const [otp,setOtp]=useState<string>("")
   const [password,setPassword]=useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
@@ -23,6 +22,7 @@ function Signup() {
     username?: string
     email?: string
     password?: string
+    otp?:number
   }>({})
   const navigate=useNavigate()
   const setMemonic=useSetRecoilState(mnemonicAtom)
@@ -34,6 +34,7 @@ function Signup() {
       username?: string
       email?: string
       password?: string
+      otp?:number
     } = {}
 
     if (!firstName.trim()) {
@@ -58,8 +59,8 @@ function Signup() {
 
     if (!password.trim()) {
       errors.password = "Password is required"
-    } else if (password.length < 6) {
-      errors.password = "Password must be at least 6 characters"
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters"
     }
 
     setFieldErrors(errors)
@@ -77,9 +78,6 @@ function Signup() {
       setLoading(true)
       try {
         const acc=await generateKeyPair()
-        console.log(acc.privateKey)
-        console.log(acc.pubKey)
-        console.log(acc.mnemonic)
         setMemonic(acc.mnemonic)
         const user=await axios.post(`${import.meta.env.VITE_BACKEND_URL_DEV}/user/signup`,{
           firstName:firstName.trim(),
@@ -90,12 +88,12 @@ function Signup() {
           privateKey:acc.privateKey,
           pubKey:acc.pubKey
         })
-        console.log(user)
         if(!user?.data) {
           setError(user?.data?.message || "Failed to create user")
           return
         }
         navigate("/signin")
+        setMemonic("")
       } catch (err: any) {
         if (axios.isAxiosError(err)) {
           const errorMessage = err.response?.data?.message || err.message || "An error occurred during sign up"
@@ -108,13 +106,18 @@ function Signup() {
       }
     } 
 
+
+    async function sendCode(){
+
+    }
+
   return (
     <>
   <div className="bg-[#0f111a] md:bg-linear-to-br md:from-[#0f111a] md:to-[#1a1c2e] min-h-screen min-w-screen fixed ">
     <div className="md:ms-12 ms-4 mt-8">
       <Logo />
     </div> 
-    <div className="flex mt-12 justify-center ">
+    <div className="flex justify-center ">
     <div className="bg-[#161823] rounded-2xl p-8 border border-[#2a2d3e] shadow-xl w-full max-w-4xl min-h-[70vh] relative flex  justify-between ">
       <div className="hidden md:block md:w-1/2">
           {/* Cards */}
@@ -221,6 +224,31 @@ function Signup() {
               <p className="text-red-500 text-sm mt-1">{fieldErrors.password}</p>
             )}
           </div>
+          <div className="mt-4">
+            <span className="flex justify-between items-center">
+              <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            placeholder="Enter OTP"
+            onChange={(e)=>{setOtp(e.target.value)}}
+            autoComplete="one-time-code"
+            className={`text-white px-4 py-2.5 rounded bg-[#272b3e7c] w-full border ${
+                fieldErrors.otp ? 'border-red-500' : 'border-transparent'
+              }`} 
+            />
+            <button
+            className="bg-purple-500 rounded-xl ms-2 px-4 py-2 text-white disabled:opacity-50"
+            onClick={sendCode}
+            disabled={loading}
+              >
+            {loading ? "Processing..." : otp ? "Verify" : "Send OTP"}
+          </button>
+
+            </span>
+          </div>
+
         </form>
         
         {error && (
@@ -248,18 +276,7 @@ function Signup() {
             </div>
           </div>
         )}
-        <div className="flex items-center gap-4 my-4">
-          <div className="grow h-px bg-gray-300"></div>
-          <span className="text-gray-500 text-sm">OR</span>
-             <div className="grow h-px bg-gray-300"></div>
-        </div>
-        <div className="flex items-center justify-center">
-          <img src="EthLa.png" alt="Ethereum icon" className="h-10 w-10 hover:-translate-y-2 duration-700"/>
-          <img src="Metamask.png" alt="Metamask icon" className="h-10 w-10 ms-12  hover:-translate-y-2 duration-700"/>
-        </div>
-
       </div>
-    
     </div>
     </div>
   </div>

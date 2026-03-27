@@ -301,6 +301,7 @@ async function deleteModal(){
   </div>
 
   <button
+    onClick={deleteWallet}
     className="
       mt-2 h-11 rounded-md
       bg-red-600/90 hover:bg-red-700
@@ -317,6 +318,12 @@ async function deleteModal(){
     </>
   )
 }
+
+async function deleteWallet() {
+    
+}
+
+
 
 function passwordModal(){
   setModalVisible(true)
@@ -455,14 +462,14 @@ async function changePass(){
                     </div>
                     <div className=''>
                     <p className='text-white/85 mt-9 '>Last Name</p>
-                    <p  className='bg-[#171826] mt-2 w-[13vw] rounded-xl border border-white/10 h-9 text-white/45 px-4 flex items-center'>{lastName}</p>
+                    <p  className='bg-[#171826] mt-2 w-[13vw] rounded-xl border border-white/10 h-9 text-white/45 px-4 flex items-center'>{lastName || 'LastName'}</p>
                     </div>
             
                 </div>
                 <p className='text-white/85 mt-5 '>Wallet Name</p>
-                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{walletName}</p>
+                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{walletName || 'WalletName'}</p>
                 <p className='text-white/85 mt-5 '>Email Address</p>
-                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{email}</p>
+                <p className='bg-[#171826] mt-2 w-full rounded-xl border border-white/10 h-9 text-white/45 px-4 items-center flex'>{email || 'email'}</p>
             </div>
             </div>
 
